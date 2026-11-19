@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" /><script src="/assets/i18n.js?v=500"></script><script src="/assets/i18n-dict.js?v=540"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#030910" />
+    <meta
+      name="description"
+      content="Persönliches Star-Citizen-Bauplanarchiv mit Fortschritt, Kategorien und Herstellungsdaten."
+    />
+    <title>SC Blueprint Dashboard · Deine Sammlung</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="stylesheet" href="/assets/styles.css?v=500" />
+    <link rel="stylesheet" href="/assets/design-system.css?v=500" />
+    <link rel="stylesheet" href="/assets/theme-palettes.css?v=500" />
+    <link rel="stylesheet" href="/assets/archive-layouts.css?v=500" />
+    <link rel="stylesheet" href="/assets/layout-variants.css?v=500" />
+    <script src="/assets/themes.js?v=500"></script>
+    <script src="/assets/app.js?v=500" defer></script>
+    <script src="/assets/dashboard-v2.js?v=500" defer></script>
+    <script src="/assets/archive-layouts.js?v=500" defer></script>
+    <script src="/assets/layout-variants.js?v=500" defer></script>
+  <link rel="stylesheet" href="/assets/next-level.css?v=500"/><script src="/assets/dashboard-v3.js?v=540" defer></script><link rel="stylesheet" href="/assets/filter-layouts.css?v=500"/><link rel="stylesheet" href="/assets/dashboard-v32.css?v=500"/><script src="/assets/filter-layouts.js?v=500" defer></script><script src="/assets/dashboard-v32.js?v=500" defer></script><link rel="stylesheet" href="/assets/mission-filters.css?v=500"/><script src="/assets/mission-filters.js?v=500" defer></script><link rel="stylesheet" href="/assets/mission-text.css?v=500"/><script src="/assets/mission-text.js?v=500" defer></script><link rel="stylesheet" href="/assets/obs-dossier.css?v=500"/><script src="/assets/obs-dossier.js?v=500" defer></script><link rel="stylesheet" href="/assets/image-popup.css?v=500"/><script src="/assets/image-popup.js?v=500" defer></script><link rel="stylesheet" href="/assets/all-missions.css?v=500"/><script src="/assets/all-missions.js?v=533" defer></script></head>
+  <body>
+    <div class="space-field" aria-hidden="true"></div>
+    <div class="scan-line" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Zum Anfang">
+          <span class="brand-mark" aria-hidden="true"><span>BP</span></span>
+          <span class="brand-copy">
+            <strong>SC BLUEPRINT ARCHIVE</strong>
+            <small>STAR CITIZEN</small>
+          </span>
+        </a>
+
+        <nav class="app-nav" aria-label="Hauptnavigation"><a href="/live.html">Live-Aufträge</a>
+          <button class="active" data-nav="archive" type="button">Sammlung</button>
+          <button data-nav="missions" type="button">Blueprint Aufträge</button>
+          <button data-nav="all-missions" type="button">Alle Aufträge</button>
+          <button data-nav="goals" type="button">Sammelziele</button>
+          <a href="/sources.html">Quellen</a><a href="/scanner.html">Logscanner</a><a href="/settings.html">Einstellungen</a><a href="/spende.html" class="nav-donate">Freiwillige Unterstützung</a>
+        </nav>
+        <div class="topbar-actions">
+          <a class="obs-button" href="/media.html" title="Eigene Itembilder verwalten">Bilder</a>
+          <a class="obs-button" href="/stream.html" title="Direkte OBS-Anbindung öffnen">
+            <span aria-hidden="true">◉</span><span>OBS-STUDIO</span>
+          </a>
+          <div class="system-state" id="systemState" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>DATEN WERDEN GELADEN</span>
+          </div>
+          <button class="icon-button" id="refreshButton" type="button" aria-label="Daten neu laden" title="Daten neu laden">
+            <span aria-hidden="true">↻</span>
+          </button>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="command-deck" aria-labelledby="pageTitle">
+          <article class="hero-panel cut-panel">
+            <div class="panel-kicker">
+              <span>PERSÖNLICHES ARCHIV</span>
+              <span id="sourceVersion">QUELLE // LOG-SCAN</span>
+            </div>
+
+            <div class="hero-grid">
+              <div class="hero-copy">
+                <p class="eyebrow">CIG BLUEPRINT INDEX</p>
+                <h1 id="pageTitle">Deine Sammlung.<br /><span>Dein nächstes Ziel.</span></h1>
+                <p class="hero-note" id="heroNote">Dein Fortschritt wird aus dem lokalen Scannerbestand aufgebaut.</p>
+              </div>
+
+              <div class="progress-orbit" id="progressOrbit" style="--progress: 0deg" role="progressbar" aria-label="Bauplanfortschritt" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="orbit-ticks" aria-hidden="true"></div>
+                <div class="progress-core">
+                  <span class="progress-label">ERHALTEN</span>
+                  <strong id="doneCount">—</strong>
+                  <span class="progress-total">VON <b id="totalCount">—</b></span>
+                </div>
+              </div>
+
+              <div class="hero-metrics" aria-label="Bauplan-Kennzahlen">
+                <div class="metric-block">
+                  <span>FORTSCHRITT</span>
+                  <strong id="progressPercent">—</strong>
+                </div>
+                <div class="metric-block">
+                  <span>NOCH OFFEN</span>
+                  <strong id="openCount">—</strong>
+                </div>
+                <div class="metric-block metric-wide">
+                  <span>LETZTER FUND</span>
+                  <strong id="latestAcquisition">—</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="telemetry-panel cut-panel" aria-labelledby="telemetryTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">SYSTEM TELEMETRIE</p>
+                <h2 id="telemetryTitle">Datenstatus</h2>
+              </div>
+              <span class="live-badge" id="syncBadge"><i aria-hidden="true"></i> <span id="syncBadgeText">SNAPSHOT</span></span>
+            </div>
+
+            <dl class="telemetry-quick"><div><dt>Datenquelle</dt><dd>Lokaler Besitzstand & Logfunde</dd></div><div><dt>SCMDB-Dossiers</dt><dd id="quickDossiers">—</dd></div><div><dt>Letzter Abgleich</dt><dd id="quickSync">—</dd></div></dl>
+            <details class="telemetry-details"><summary>Alle Datenquellen anzeigen</summary>
+            <dl class="telemetry-list">
+              <div>
+                <dt>Logdateien geprüft</dt>
+                <dd id="logFileCount">—</dd>
+              </div>
+              <div>
+                <dt>Katalogeinträge</dt>
+                <dd id="catalogCount">—</dd>
+              </div>
+              <div>
+                <dt>Mit Detaildaten</dt>
+                <dd id="catalogCoverage">—</dd>
+              </div>
+              <div>
+                <dt>Scannerstand</dt>
+                <dd id="scanTimestamp">—</dd>
+              </div>
+              <div>
+                <dt>SCMDB-Version</dt>
+                <dd id="scmdbVersion">—</dd>
+              </div>
+              <div>
+                <dt>Auftragsübersetzung</dt>
+                <dd id="translationStatus">—</dd>
+              </div>
+              <div>
+                <dt>Letzte Auto-Synchronisierung</dt>
+                <dd id="syncTimestamp">—</dd>
+              </div>
+            </dl></details>
+
+            <div class="activity-block">
+              <div class="activity-heading">
+                <span>ERWERBE NACH MONAT</span>
+                <strong id="activityTotal">—</strong>
+              </div>
+              <div class="activity-chart" id="activityChart" aria-label="Bauplan-Erwerbe der letzten Monate"></div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="new-intel cut-panel" id="newIntel" hidden aria-labelledby="newIntelTitle">
+          <div class="intel-heading">
+            <span class="intel-icon" aria-hidden="true">＋</span>
+            <div>
+              <p class="eyebrow">SEIT LETZTER SICHERUNG</p>
+              <h2 id="newIntelTitle"><span id="newBlueprintCount">0</span> neue Baupläne registriert</h2>
+            </div>
+          </div>
+          <div class="intel-items" id="newBlueprints"></div>
+        </section>
+
+        <section class="archive-section" aria-labelledby="archiveTitle">
+          <div class="archive-heading">
+            <div>
+              <p class="eyebrow">ARCHIVZUGRIFF</p>
+              <h2 id="archiveTitle">Baupläne durchsuchen</h2>
+            </div>
+            <p class="result-count" id="resultCount" aria-live="polite">Daten werden geladen …</p>
+          </div>
+
+          <div class="filter-console cut-panel">
+            <label class="search-field" for="searchInput">
+              <span aria-hidden="true">⌕</span>
+              <input id="searchInput" type="search" autocomplete="off" placeholder="Name, Hersteller oder INI-Schlüssel suchen …" />
+              <kbd>/</kbd>
+            </label>
+
+            <div class="status-tabs" role="group" aria-label="Besitzstatus filtern">
+              <button class="status-tab is-active" type="button" data-status="all" aria-pressed="true">Alle</button>
+              <button class="status-tab" type="button" data-status="done" aria-pressed="false">Erhalten</button>
+              <button class="status-tab" type="button" data-status="open" aria-pressed="false">Offen</button>
+            </div>
+
+            <label class="select-field">
+              <span>Schnellwahl</span>
+              <select id="categorySelect">
+                <option value="all">Alle Kategorien</option>
+              </select>
+            </label>
+
+            <label class="select-field">
+              <span>Sortierung</span>
+              <select id="sortSelect">
+                <option value="name">Name A–Z</option>
+                <option value="recent">Neueste zuerst</option>
+                <option value="category">Kategorie</option>
+              </select>
+            </label>
+
+            <button class="reset-filter-button" id="resetFiltersButton" type="button">
+              <span aria-hidden="true">↺</span>
+              <span>Filter zurücksetzen</span>
+              <b id="activeFilterCount">0</b>
+            </button>
+          </div>
+
+          <div class="collection-toolbar" id="collectionToolbar">
+            <button class="quiet-button" id="favoritesFilter" type="button" aria-pressed="false">☆ Favoriten</button>
+            <button class="quiet-button" id="goalsFilter" type="button" aria-pressed="false">◎ Sammelziele</button>
+            <select class="saved-select" id="savedFilters" aria-label="Gespeicherte Filter"><option value="">Meine Filter</option></select>
+            <button class="quiet-button" id="savePreset" type="button">Filter speichern</button>
+            <button class="quiet-button" id="deletePreset" type="button" hidden>Filter löschen</button>
+            <div class="view-switch" role="group" aria-label="Darstellung">
+              <button class="view-button is-active" data-view="gallery" type="button" aria-pressed="true">Galerie</button>
+              <button class="view-button" data-view="table" type="button" aria-pressed="false">Tabelle</button>
+              <button class="view-button" data-view="missions" type="button" aria-pressed="false">Blueprint Aufträge</button>
+            </div>
+          </div>
+          <div class="collection-summary" id="collectionSummary"></div>
+          <section class="facet-console cut-panel" aria-labelledby="facetTitle">
+            <header class="facet-header">
+              <div>
+                <p class="eyebrow">PRÄZISIONSFILTER</p>
+                <h3 id="facetTitle">Typ, Größe und Eigenschaften</h3>
+              </div>
+              <button class="facet-toggle" id="facetToggle" type="button" aria-expanded="false" aria-controls="facetBody">FILTER AUSKLAPPEN</button>
+            </header>
+
+            <div class="facet-body" id="facetBody" hidden>
+              <section class="facet-block facet-types" aria-labelledby="typeFacetTitle">
+                <div class="facet-title-row">
+                  <h4 id="typeFacetTitle">Typ</h4>
+                  <button class="filter-chip is-active" id="allTypeButton" type="button" aria-pressed="true">Alle</button>
+                </div>
+
+                <h5>FPS-Ausrüstung</h5>
+                <div class="filter-chip-list">
+                  <button class="filter-chip" type="button" data-type-filter="fpsgear:ammo" aria-pressed="false"><i aria-hidden="true">▥</i> Munition</button>
+                  <button class="filter-chip" type="button" data-type-filter="fpsgear:armour" aria-pressed="false"><i aria-hidden="true">⬡</i> Rüstung</button>
+                  <button class="filter-chip" type="button" data-type-filter="fpsgear:weapons" aria-pressed="false"><i aria-hidden="true">⌁</i> Waffen</button>
+                  <button class="filter-chip" type="button" data-type-filter="fpsgear:clothing" aria-pressed="false"><i aria-hidden="true">◇</i> Kleidung</button>
+                  <button class="filter-chip" type="button" data-type-filter="fpsgear:tools" aria-pressed="false"><i aria-hidden="true">⌕</i> Werkzeuge</button>
+                </div>
+
+                <h5>Schiffskomponenten</h5>
+                <div class="filter-chip-list ship-filter-list">
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:cooler" aria-pressed="false">❄ Kühler</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:mininglaser" aria-pressed="false">⛏ Bergbaulaser</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:miningmodule" aria-pressed="false">◆ Bergbau-Modul</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:orepod" aria-pressed="false">⬢ Erzbehälter</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:powerplant" aria-pressed="false">ϟ Kraftwerk</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:quantumdrive" aria-pressed="false">➤ Quantumantrieb</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:radar" aria-pressed="false">⌁ Radar</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:refuelling" aria-pressed="false">▣ Betankung</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:salvage" aria-pressed="false">♻ Bergung</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:shield" aria-pressed="false">◈ Schild</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:weapons" aria-pressed="false">⚔ Schiffswaffe</button>
+                  <button class="filter-chip" type="button" data-type-filter="vehiclegear:tractorbeam" aria-pressed="false">∩ Traktorstrahl</button>
+                </div>
+              </section>
+
+              <section class="facet-block facet-size" aria-labelledby="sizeFacetTitle">
+                <div class="facet-title-row">
+                  <h4 id="sizeFacetTitle">Größe</h4>
+                  <output id="sizeRangeOutput">0–6</output>
+                </div>
+                <div class="dual-range" id="sizeRange" style="--range-min:0%;--range-max:100%">
+                  <div class="range-rail" aria-hidden="true"><i></i></div>
+                  <input id="sizeMin" type="range" min="0" max="6" step="1" value="0" aria-label="Minimale Größe" />
+                  <input id="sizeMax" type="range" min="0" max="6" step="1" value="6" aria-label="Maximale Größe" />
+                </div>
+                <div class="range-scale" aria-hidden="true"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+              </section>
+
+              <section class="facet-block facet-dynamic" aria-labelledby="dynamicFacetTitle">
+                <div class="facet-title-row"><h4 id="dynamicFacetTitle">Eigenschaften</h4><span class="dynamic-mode" id="dynamicMode">TYP WÄHLEN</span></div>
+                <p class="facet-help" id="dynamicFilterHint">Wähle oben einen Ausrüstungstyp. Danach erscheinen genau die dazu passenden Zusatzfilter.</p>
+
+                <div class="dynamic-filter-group" id="armorFilters" hidden>
+                  <h5>Rüstungsklasse</h5>
+                  <div class="filter-chip-list">
+                    <button class="filter-chip" type="button" data-facet="armorClass" data-value="light" aria-pressed="false">Leicht</button>
+                    <button class="filter-chip" type="button" data-facet="armorClass" data-value="medium" aria-pressed="false">Mittel</button>
+                    <button class="filter-chip" type="button" data-facet="armorClass" data-value="heavy" aria-pressed="false">Schwer</button>
+                  </div>
+                  <h5>Rüstungsslot</h5>
+                  <div class="filter-chip-list">
+                    <button class="filter-chip" type="button" data-facet="armorSlot" data-value="helmet" aria-pressed="false">Helm</button>
+                    <button class="filter-chip" type="button" data-facet="armorSlot" data-value="torso" aria-pressed="false">Brust</button>
+                    <button class="filter-chip" type="button" data-facet="armorSlot" data-value="arms" aria-pressed="false">Arme</button>
+                    <button class="filter-chip" type="button" data-facet="armorSlot" data-value="legs" aria-pressed="false">Beine</button>
+                    <button class="filter-chip" type="button" data-facet="armorSlot" data-value="backpack" aria-pressed="false">Rucksack</button>
+                    <button class="filter-chip" type="button" data-facet="armorSlot" data-value="undersuit" aria-pressed="false">Basisanzug</button>
+                  </div>
+                  <h5>Untertyp</h5>
+                  <div class="filter-chip-list compact-chips">
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="combat" aria-pressed="false">Kampf</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="cosmonaut" aria-pressed="false">Kosmonaut</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="engineer" aria-pressed="false">Techniker</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="environment" aria-pressed="false">Umwelt</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="explorer" aria-pressed="false">Entdecker</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="flightsuit" aria-pressed="false">Fluganzug</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="hunter" aria-pressed="false">Jäger</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="medic" aria-pressed="false">Medizin</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="miner" aria-pressed="false">Bergbau</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="racer" aria-pressed="false">Rennsport</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="radiation" aria-pressed="false">Strahlung</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="salvager" aria-pressed="false">Bergung</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="stealth" aria-pressed="false">Tarnung</button>
+                    <button class="filter-chip" type="button" data-facet="armorSubtype" data-value="undersuit" aria-pressed="false">Basisanzug</button>
+                  </div>
+                </div>
+
+                <div class="dynamic-filter-group" id="weaponFilters" hidden>
+                  <h5>Munitionstyp</h5>
+                  <div class="filter-chip-list">
+                    <button class="filter-chip" type="button" data-facet="weaponClass" data-value="ballistic" aria-pressed="false">Ballistisch</button>
+                    <button class="filter-chip" type="button" data-facet="weaponClass" data-value="energy" aria-pressed="false">Energie</button>
+                    <button class="filter-chip" type="button" data-facet="weaponClass" data-value="electron" aria-pressed="false">Elektron</button>
+                    <button class="filter-chip" type="button" data-facet="weaponClass" data-value="laser" aria-pressed="false">Laser</button>
+                    <button class="filter-chip" type="button" data-facet="weaponClass" data-value="plasma" aria-pressed="false">Plasma</button>
+                  </div>
+                  <h5>Untertyp</h5>
+                  <div class="filter-chip-list">
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="lmg" aria-pressed="false">LMG</button>
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="unknown" aria-pressed="false">–</button>
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="pistol" aria-pressed="false">Pistole</button>
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="rifle" aria-pressed="false">Gewehr</button>
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="shotgun" aria-pressed="false">Schrotflinte</button>
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="smg" aria-pressed="false">SMG</button>
+                    <button class="filter-chip" type="button" data-facet="weaponSubtype" data-value="sniper" aria-pressed="false">Scharfschützengewehr</button>
+                  </div>
+                </div>
+
+                <div class="dynamic-filter-group" id="ammoFilters" hidden>
+                  <h5>Untertyp</h5>
+                  <div class="filter-chip-list">
+                    <button class="filter-chip" type="button" data-facet="ammoSubtype" data-value="ballistic" aria-pressed="false">Ballistisch</button>
+                    <button class="filter-chip" type="button" data-facet="ammoSubtype" data-value="electron" aria-pressed="false">Elektron</button>
+                    <button class="filter-chip" type="button" data-facet="ammoSubtype" data-value="laser" aria-pressed="false">Laser</button>
+                    <button class="filter-chip" type="button" data-facet="ammoSubtype" data-value="plasma" aria-pressed="false">Plasma</button>
+                    <button class="filter-chip" type="button" data-facet="ammoSubtype" data-value="shotgun" aria-pressed="false">Schrotflinte</button>
+                  </div>
+                </div>
+
+                <div class="dynamic-filter-group" id="shipWeaponFilters" hidden>
+                  <h5>Waffentechnologie</h5>
+                  <div class="filter-chip-list compact-chips">
+                    <button class="filter-chip" type="button" data-facet="shipWeaponSubtype" data-value="ballistic" aria-pressed="false">Ballistisch</button>
+                    <button class="filter-chip" type="button" data-facet="shipWeaponSubtype" data-value="distortion" aria-pressed="false">Verzerrung</button>
+                    <button class="filter-chip" type="button" data-facet="shipWeaponSubtype" data-value="laser" aria-pressed="false">Laser</button>
+                    <button class="filter-chip" type="button" data-facet="shipWeaponSubtype" data-value="neutron" aria-pressed="false">Neutron</button>
+                    <button class="filter-chip" type="button" data-facet="shipWeaponSubtype" data-value="tachyon" aria-pressed="false">Tachyon</button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <div class="archive-layout">
+            <aside class="category-panel cut-panel" aria-labelledby="categoryTitle">
+              <div class="panel-heading compact">
+                <div>
+                  <p class="eyebrow">VERTEILUNG</p>
+                  <h3 id="categoryTitle">Kategorien</h3>
+                </div>
+              </div>
+              <label class="category-global-row" title="Alle Haupt- und Unterkategorien gemeinsam an- oder abwählen">
+                <input id="categoryAllCheck" type="checkbox" aria-label="Alle Kategorien an- oder abwählen" aria-controls="categoryList" />
+                <span><strong>Alle Kategorien</strong><small id="categorySelectionCount">Alle ausgewählt</small></span>
+              </label>
+              <div class="category-list" id="categoryList"></div>
+            </aside>
+
+            <div class="inventory-panel cut-panel">
+              <div class="blueprint-gallery" id="blueprintGallery"></div>
+              <div id="missionPlanner" hidden></div>
+              <div class="table-wrap" id="tableView" hidden>
+                <table class="blueprint-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Status</th>
+                      <th scope="col">Bauplan</th>
+                      <th scope="col">Kategorie</th>
+                      <th scope="col">Klasse</th>
+                      <th scope="col">Fundwege</th>
+                      <th scope="col">Zeitpunkt</th>
+                      <th scope="col"><span class="sr-only">Details</span></th>
+                    </tr>
+                  </thead>
+                  <tbody id="blueprintRows">
+                    <tr class="loading-row">
+                      <td colspan="7"><span class="loading-scan">Katalog wird verbunden</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="empty-state" id="emptyState" hidden>
+                <span aria-hidden="true">◇</span>
+                <h3>Keine Baupläne gefunden</h3>
+                <p>Ändere Suche oder Filter, um wieder Einträge anzuzeigen.</p>
+                <button class="secondary-button" id="resetFiltersEmpty" type="button">Filter zurücksetzen</button>
+              </div>
+
+              <div class="pagination" id="pagination" hidden>
+                <button class="secondary-button" id="loadMoreButton" type="button">Weitere Einträge laden</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>GAME.LOG // <a href="https://scmdb.net/" target="_blank" rel="noopener noreferrer">SCMDB</a> // <a href="https://github.com/rjcncpt/StarCitizen-Deutsch-INI/blob/main/scmdb/lang-de.json" target="_blank" rel="noopener noreferrer">DEUTSCHE AUFTRÄGE</a> // <a href="https://robertsspaceindustries.com/" target="_blank" rel="noopener noreferrer">ROBERTS SPACE INDUSTRIES</a></span>
+        <span id="footerVersion">DASHBOARD 6.0.0</span>
+      </footer>
+    </div>
+
+    <dialog class="detail-dialog" id="detailDialog" aria-labelledby="detailTitle">
+      <div class="dialog-shell">
+        <header class="dialog-header">
+          <div>
+            <p class="eyebrow" id="detailType">BAUPLAN</p>
+            <h2 id="detailTitle">Details</h2>
+          </div>
+          <button class="icon-button dialog-close" id="closeDialog" type="button" aria-label="Detailansicht schließen">×</button>
+        </header>
+        <div class="dialog-status" id="detailStatus"></div>
+        <div class="detail-actions" id="detailActions"></div>
+
+        <section class="detail-lead">
+          <div class="item-gallery" id="detailGallery" aria-label="Item-Bilder"></div>
+          <dl class="detail-grid" id="detailGrid"></dl>
+        </section>
+
+        <section class="detail-card detail-lore" id="detailLore">
+          <div class="detail-section-heading">
+            <div>
+              <p class="eyebrow">ITEM-DOSSIER</p>
+              <h3>Beschreibung</h3>
+            </div>
+            <span class="source-chip" id="detailLoreSource">LOKAL</span>
+          </div>
+          <p id="detailLoreText">Beschreibung wird geladen …</p>
+          <div class="source-links" id="detailSourceLinks"></div>
+        </section>
+
+        <section class="detail-card detail-description" id="detailDescription" hidden>
+          <div class="detail-section-heading">
+            <div>
+              <p class="eyebrow">SCMDB · KATALOG</p>
+              <h3>Technik &amp; Herstellung</h3>
+            </div>
+            <span class="source-chip">LOKALER KATALOG</span>
+          </div>
+          <pre id="detailDescriptionText"></pre>
+        </section>
+
+        <section class="detail-card detail-recipe" id="detailRecipe" hidden>
+          <div class="detail-section-heading">
+            <div>
+              <p class="eyebrow">SCMDB CRAFTING</p>
+              <h3>Bauplan-Rezept</h3>
+            </div>
+            <span class="source-chip" id="detailCraftTime">—</span>
+          </div>
+          <div class="recipe-grid" id="detailRecipeContent"></div>
+          <div class="material-sources" id="detailMaterialSources" hidden></div>
+        </section>
+
+        <section class="detail-card detail-acquisition" id="detailAcquisition">
+          <div class="detail-section-heading">
+            <div>
+              <p class="eyebrow">SCMDB · DEUTSCHE SPRACHDATEI</p>
+              <h3>Auftragsbeschreibung &amp; Quelle</h3>
+            </div>
+            <span class="source-chip" id="detailMissionCount">—</span>
+          </div>
+          <p class="acquisition-hint" id="detailAcquisitionHint"></p>
+          <div class="mission-list" id="detailMissionList"></div>
+        </section>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <div class="compare-dock" id="compareDock" hidden aria-live="polite"><span id="compareCount"></span><button class="primary-button" id="openCompare" type="button">Vergleichen</button><button class="quiet-button" id="clearCompare" type="button">Leeren</button></div>
+    <dialog class="generic-dialog" id="compareDialog" aria-labelledby="compareTitle"><header class="dialog-header"><h2 id="compareTitle">Dein Vergleich</h2><button class="icon-button" data-close-dialog type="button" aria-label="Vergleich schließen">×</button></header><div id="compareContent"></div></dialog>
+    <dialog class="generic-dialog" id="presetDialog" aria-labelledby="presetTitle"><form class="prompt-form" id="presetForm"><h2 id="presetTitle">Filter speichern</h2><label class="setting-field"><span>Name</span><input id="presetName" maxlength="80" required placeholder="Zum Beispiel: Schwere Rüstung · Offen" /></label><div class="settings-actions"><button class="primary-button" type="submit">Speichern</button><button class="quiet-button" type="button" data-close-dialog>Abbrechen</button></div></form></dialog>
+  <footer class="legal-foot" lang="en"><p>This site is not endorsed by or affiliated with the Cloud Imperium or Roberts Space Industries group of companies. All game content and materials are copyright Cloud Imperium Rights LLC and Cloud Imperium Rights Ltd.. Star Citizen®, Squadron 42®, Roberts Space Industries®, and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC. All rights reserved.</p><p lang="de">Inoffizielles Fanprojekt. Programmcode unter MIT-Lizenz. Spieldaten: <a href="https://scmdb.net/" target="_blank" rel="noopener noreferrer">SCMDB</a>. Deutsche Texte: <a href="https://github.com/rjcncpt/StarCitizen-Deutsch-INI" target="_blank" rel="noopener noreferrer">StarCitizen-Deutsch-INI</a>, <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>. Weitere Daten und Bilder gehören ihren Rechteinhabern (siehe <a href="/lizenzen.html">Lizenzen</a>).</p></footer>
+</body>
+</html>

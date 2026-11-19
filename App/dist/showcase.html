@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" /><script src="/assets/i18n.js?v=500"></script><script src="/assets/i18n-dict.js?v=540"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#00000000" />
+    <meta name="description" content="Transparente OBS-Browserquelle für deutsche Star-Citizen-Bauplanaufträge." />
+    <title>Blueprint Mission HUD</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="assets/obs.css" />
+    <link rel="stylesheet" href="assets/design-system.css" />
+    <link rel="stylesheet" href="assets/theme-palettes.css" />
+    <link rel="stylesheet" href="assets/obs-themes.css" />
+    <link rel="stylesheet" href="assets/obs-strip.css" />
+    <script src="assets/themes.js"></script>
+    <script src="assets/obs.js" defer></script>
+  <link rel="stylesheet" href="/assets/next-level.css?v=500"/></head>
+  <body>
+    <main class="obs-stage" aria-live="polite">
+      <section class="obs-strip" id="obsStrip" aria-label="Kompakte Bauplan-Leiste">
+        <img class="strip-logo" src="assets/blueprint-mark.svg" alt="Blueprint Archive" />
+        <div class="strip-image" id="stripImageFrame"><img id="stripImage" alt="" /><span class="strip-placeholder">KEIN ITEM-BILD VERFÜGBAR</span></div>
+        <div class="strip-copy"><small id="stripStatus">NÄCHSTER BAUPLAN</small><h1 id="stripTitle">Bauplan wird geladen</h1><p id="stripMission">Daten werden verbunden …</p></div>
+        <div class="strip-reward"><strong id="stripReward">—</strong><span class="strip-track"><i id="stripProgress"></i></span><small id="stripProgressLabel">DEINE SAMMLUNG</small></div>
+        <span class="strip-signature">STAR CITIZEN</span>
+      </section>
+      <article class="mission-hud is-loading" id="missionHud">
+        <div class="hud-scan" aria-hidden="true"></div>
+        <header class="hud-header">
+          <div class="hud-brand"><span class="hud-logo">BP</span><span>BLUEPRINT INTEL</span></div>
+          <div class="hud-status"><i aria-hidden="true"></i><span id="dataStatus">DATEN WERDEN GELADEN</span></div>
+        </header>
+
+        <div class="hud-layout">
+          <figure class="hud-image" id="imageFrame">
+            <img id="itemImage" alt="" />
+            <figcaption>ITEM VISUAL</figcaption>
+          </figure>
+
+          <div class="hud-content">
+            <div class="hud-kicker-row">
+              <span id="itemStatus">GESUCHTER BAUPLAN</span>
+              <span id="languageStatus">DEUTSCH</span>
+            </div>
+            <h1 id="itemName">Bauplan wird geladen</h1>
+            <p class="hud-item-meta" id="itemMeta">SCMDB-DATEN WERDEN VERBUNDEN</p>
+
+            <section class="hud-mission" aria-labelledby="missionTitle">
+              <span class="hud-contractor" id="missionContractor">AUFTRAGGEBER</span>
+              <h2 id="missionTitle">Auftrag wird geladen</h2>
+              <p class="hud-original" id="missionOriginal" hidden></p>
+              <p class="hud-description" id="missionDescription">Die deutsche Auftragsbeschreibung wird vorbereitet.</p>
+            </section>
+
+            <dl class="hud-metrics">
+              <div><dt>ITEM-CHANCE · BASIS</dt><dd id="missionChance">—</dd></div>
+              <div><dt>BELOHNUNGSPOOL</dt><dd id="missionPool">—</dd></div>
+              <div><dt>PRÄMIE</dt><dd id="missionReward">—</dd></div>
+              <div><dt>SYSTEM</dt><dd id="missionSystem">—</dd></div>
+              <div><dt>MINDESTRANG</dt><dd id="missionStanding">—</dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <footer class="hud-footer">
+          <span id="missionType">AUFTRAG</span>
+          <span>ÜBERSETZUNG: STAR CITIZEN DEUTSCH-INI</span>
+          <span id="slideCounter">00 / 00</span>
+        </footer>
+        <div class="hud-progress" aria-hidden="true"><i id="cycleProgress"></i></div>
+      </article>
+    </main>
+  </body>
+</html>

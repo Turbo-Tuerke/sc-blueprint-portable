@@ -1,0 +1,33 @@
+﻿SC BLUEPRINT DASHBOARD 6.0.0 - PORTABLE VERSION FUER WINDOWS (64 BIT)
+
+START
+1. ZIP vollstaendig in einen eigenen Ordner entpacken (nicht direkt aus dem ZIP starten).
+2. "Start.cmd" doppelt anklicken. Die Seite oeffnet sich nach wenigen Sekunden im Browser:
+   http://127.0.0.1:8188/
+3. Zum Beenden "Beenden.cmd" doppelt anklicken.
+
+Keine Installation noetig: Python 3.12 liegt im Ordner "Runtime". Kein NAS, kein Docker.
+Fuer Windows 10/11 x64.
+
+BEIM ERSTEN START
+- Der Spielkatalog (Bauplaene, Auftraege, deutsche Uebersetzung) wird einmalig von SCMDB
+  geladen. Dafuer ist Internet noetig, das dauert etwa eine Minute.
+- Der Star-Citizen-Ordner wird automatisch gesucht. Pruefen und anpassen unter
+  Einstellungen > Windows & Pfade.
+- Besitz kommt aus dem Game.log; einzelne Items lassen sich im Dossier von Hand
+  markieren.
+- Funde, die schon im Log stehen, gelten als alt und erzeugen keine OBS-Meldung.
+
+SPRACHE
+Oben rechts mit der deutschen oder englischen Flagge umschalten. Deutsch ist Standard.
+
+OBS
+Browserquelle: http://127.0.0.1:8188/obs.html (nur auf diesem PC erreichbar).
+
+DATEN
+Alle Einstellungen, der Sammlungsstand und eigene Bilder liegen im Ordner "Daten".
+Bei einem Update nur "App" und "Runtime" ersetzen, "Daten" behalten.
+
+HINWEIS
+Inoffizielles Fanprojekt, nicht verbunden mit Cloud Imperium Games. Programmcode unter
+MIT-Lizenz (LICENSE), weitere Hinweise in LIZENZEN.md. Python: Runtime\LICENSE.txt.

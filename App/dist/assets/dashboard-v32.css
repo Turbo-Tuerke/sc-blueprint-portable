@@ -1,0 +1,82 @@
+:root{--card-scale:.7;--dossier-width:33.8%;--dossier-min:416px;--dossier-font:20px}
+.reference-layout #detailDialog.is-live-mission .dialog-header>div:after{content:'Auftrags-Dossier'}
+@media(max-width:720px){.reference-layout #obsidianNav .app-nav{flex-wrap:wrap;justify-content:flex-start!important;max-width:100%;gap:3px 12px}.reference-layout #obsidianNav .app-nav>*{flex:none;min-width:0}}
+.is-live-mission #closeDialog{display:grid!important;align-self:start}.reference-layout .is-live-mission .dialog-header>div:after{content:'Auftrags-Dossier'}.is-live-mission .dialog-header #detailType,.is-live-mission .dialog-header #detailStatus{display:block!important;font-size:12px;line-height:1.5;margin:5px 0;color:var(--muted)}
+#liveMissionPane .mission-card{display:block!important;position:static!important;padding:16px!important;border:1px solid var(--line);border-radius:10px;margin:0 0 15px;min-width:0}
+#liveMissionPane .obsidian-mission-title{display:flex;gap:12px;align-items:center;margin-bottom:16px}#liveMissionPane .obsidian-mission-title>div{min-width:0}#liveMissionPane .mission-emblem{width:34px;flex:none}#liveMissionPane .obsidian-mission-title h4{font:500 20px/1.35 Inter,system-ui;margin:0}#liveMissionPane .obsidian-mission-title p{font-size:12px;margin:5px 0;color:var(--muted)}#liveMissionPane .obsidian-mission-full{display:block;position:static;font-size:14px}#liveMissionPane .obsidian-mission-full p{font-size:16px;line-height:1.65;white-space:pre-line;display:block;margin:12px 0}#liveMissionPane .obsidian-mission-facts{font-size:13px;margin:12px 0}#liveMissionPane .mission-payout-card{display:block;padding:14px 0;margin:10px 0 0;border:0;border-top:1px solid var(--line);background:none}#liveMissionPane .mission-payout-card strong{display:block;white-space:nowrap;margin-top:6px}#liveMissionPane .reward-item-row{font-size:14px;line-height:1.6;padding:7px 0}#liveMissionPane .reward-pool-card{padding:14px;border-radius:8px;margin:0 0 12px}#liveMissionPane .obsidian-pool-note{font-size:12px;line-height:1.6;color:var(--muted)}
+.blueprint-gallery:not(:has(.polaris-row)){grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr))!important;gap:12px!important}
+.blueprint-gallery .blueprint-card:not(.polaris-row){min-height:0!important}.blueprint-gallery .blueprint-card:not(.polaris-row) .card-visual{height:calc(220px * var(--card-scale))!important}
+[data-layout=nocturne] .blueprint-gallery .blueprint-card .card-visual{height:calc(250px * var(--card-scale))!important}
+.blueprint-gallery .blueprint-card:not(.polaris-row) .card-body{padding:calc(16px * var(--card-scale))!important;min-height:90px!important}.blueprint-gallery .blueprint-card:not(.polaris-row) .card-title{font-size:max(13px,.85rem)!important;min-height:2.6em;line-height:1.3;margin-bottom:5px}.blueprint-gallery .obsidian-card-buttons{position:static;margin-top:7px;justify-content:space-between}.blueprint-gallery .obsidian-card-meta{font-size:11px!important;flex-wrap:wrap;gap:6px!important}.blueprint-gallery .card-visual img{padding:10px!important}
+/* Dossier typography follows the mission planner, without nested em scaling.
+   The saved dossier value remains adjustable: 20 = the reference hierarchy. */
+:root{
+ --dossier-type-scale:1;
+ --dossier-title-size:calc(1.25rem * var(--dossier-type-scale));
+ --dossier-copy-size:calc(.86rem * var(--dossier-type-scale));
+ --dossier-meta-size:calc(.78rem * var(--dossier-type-scale));
+ --dossier-summary-size:calc(.8rem * var(--dossier-type-scale));
+ --dossier-note-size:calc(.7rem * var(--dossier-type-scale));
+ --dossier-value-size:calc(1.08rem * var(--dossier-type-scale));
+ --dossier-item-size:calc(.76rem * var(--dossier-type-scale));
+}
+#detailDialog{font-size:var(--dossier-copy-size)}
+#detailDialog :is(#detailTitle,.obsidian-mission-title h4,.mission-title-row h4){
+ font:400 var(--dossier-title-size) var(--heading)!important;
+ letter-spacing:normal!important;overflow-wrap:anywhere;
+}
+#detailDialog :is(.obsidian-mission-excerpt,.obsidian-mission-full p,.mission-description-block p,#detailDescriptionText,#detailLoreText){
+ font-size:var(--dossier-copy-size)!important;line-height:1.55!important;
+ color:var(--muted-strong)!important;white-space:pre-line;overflow-wrap:anywhere;
+}
+#detailDialog :is(.obsidian-mission-title p,.mission-original-title,.mission-meta,.detail-grid dd,.obsidian-mission-facts dd){
+ font-size:var(--dossier-meta-size)!important;line-height:1.55!important;
+}
+#detailDialog :is(.obsidian-mission-full summary,.obsidian-mission-facts summary,.mission-details>summary,.obsidian-pool-heading,.mission-subheading span){
+ font-size:var(--dossier-summary-size)!important;line-height:1.5!important;
+}
+#detailDialog :is(#detailType,#detailStatus,.mission-language,.mission-state,.obsidian-pool-note,.pool-explainer,.mission-source-row,.mission-source-row small,.mission-subheading b,.obsidian-mission-facts dt,.mission-payout-card>span,.live-mission-note){
+ font-size:var(--dossier-note-size)!important;line-height:1.55!important;
+}
+#detailDialog :is(.obsidian-mission-full,.obsidian-mission-facts){margin:12px 0!important}
+#detailDialog :is(.obsidian-mission-full,.obsidian-mission-facts)>summary{padding:8px 0!important;color:var(--cyan)!important}
+#detailDialog .obsidian-mission-full>.mission-language{display:inline-block;margin:8px 0 0}
+#detailDialog .obsidian-mission-full>a{font-size:var(--dossier-note-size);line-height:1.55;overflow-wrap:anywhere}
+#detailDialog .obsidian-mission-block:has(.obsidian-mission-full[open]) .obsidian-mission-excerpt{display:none}
+#detailDialog .mission-payout-card strong{font-size:var(--dossier-value-size)!important;font-weight:500!important;line-height:1.5!important;white-space:normal!important}
+#detailDialog .obsidian-pool-heading{margin:16px 0 10px!important}
+#detailDialog :is(#detailMissionList,#liveMissionPane) .reward-pool-list{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;
+}
+#detailDialog .reward-pool-card{
+ min-width:0;padding:12px!important;margin:0!important;
+ border:1px solid var(--line)!important;border-radius:8px!important;background:var(--bg-soft)!important;
+}
+#detailDialog .reward-pool-card:only-child{grid-column:1/-1}
+#detailDialog .reward-pool-card>header{display:block!important;padding:0 0 9px!important;margin:0 0 6px!important}
+#detailDialog .reward-pool-card>header strong{font:var(--dossier-meta-size) "Cascadia Mono",Consolas,monospace!important;overflow-wrap:anywhere}
+#detailDialog .reward-pool-card>header small{font-size:calc(.54rem * var(--dossier-type-scale))!important;line-height:1.5!important}
+#detailDialog .reward-pool-card>header>span{font-size:calc(.67rem * var(--dossier-type-scale))!important;line-height:1.5!important;white-space:normal!important;overflow-wrap:anywhere}
+#detailDialog .reward-item-list{gap:1px!important}
+#detailDialog .reward-item-row{min-height:1px!important;padding:2px 3px!important;gap:5px!important;align-items:start!important;border-radius:3px}
+#detailDialog .reward-item-row>span:not(.reward-owned){
+ font:var(--dossier-item-size) "Cascadia Mono",Consolas,monospace!important;
+ white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere;text-overflow:clip!important;
+}
+#detailDialog .reward-owned{margin-top:3px!important}
+#detailDialog .reward-owned b{width:14px!important;height:14px!important;font-size:11px!important}
+#detailDialog .obsidian-pool-note{margin:12px 0 18px!important}
+@media(min-width:1160px){.reference-layout:not([data-layout=halo]) .obsidian-workspace{grid-template-columns:minmax(200px,16%) minmax(0,1fr) minmax(var(--dossier-min),var(--dossier-width))!important}.reference-layout[data-layout=nocturne] .obsidian-workspace{grid-template-columns:minmax(0,1fr) 200px minmax(var(--dossier-min),var(--dossier-width))!important}.reference-layout[data-layout=aurum] .obsidian-workspace,.reference-layout[data-layout=polaris] .obsidian-workspace,.reference-layout[data-layout=sentinel] .obsidian-workspace{grid-template-columns:minmax(200px,16%) minmax(0,1fr) minmax(var(--dossier-min),var(--dossier-width))!important}.reference-layout .obsidian-center{padding:22px 18px!important;min-width:0}.reference-layout .obsidian-dock{min-width:0}.reference-layout .obsidian-tools{flex-wrap:wrap}.reference-layout .filter-console{display:flex!important;flex-wrap:wrap;gap:8px!important}.reference-layout .filter-console .search-field{width:100%;flex:auto}.reference-layout .filter-console .status-tabs{flex:1}.reference-layout .filter-console .select-field{flex:1;min-width:115px}.reference-layout .filter-console .select-field:not([hidden]){display:flex!important}}
+.live-mission-pane{display:none}.is-live-mission .live-mission-pane{display:block;overflow:auto;min-height:0;padding:16px;flex:1;order:3}.is-live-mission #detailGallery,.is-live-mission .dossier-tabs,.is-live-mission .dossier-pane,.is-live-mission .variant-mission-choice,.is-live-mission #detailActions,.is-live-mission .dossier-favorite,.is-live-mission #detailGrid,.is-live-mission #detailLore,.is-live-mission #detailDescription,.is-live-mission #detailRecipe,.is-live-mission #detailAcquisition,.is-live-mission #detailSourceLinks{display:none!important}.is-live-mission .dialog-header{order:0}.live-mission-note{font-size:12px;color:var(--cyan);padding:10px 12px;margin:0 0 16px;border-left:2px solid var(--cyan);background:var(--cyan-soft)}.is-live-mission .obsidian-mission-excerpt{display:none!important}.is-live-mission .obsidian-mission-full>summary{display:none}.is-live-mission .mission-payout-card strong{font-size:1.5em!important}.is-live-mission .reward-pool-list{display:grid;grid-template-columns:1fr!important}
+@media(max-width:720px){.blueprint-gallery:not(:has(.polaris-row)){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.blueprint-gallery .blueprint-card:not(.polaris-row) .card-visual{height:120px!important}.blueprint-gallery .blueprint-card .card-title{font-size:12px!important}.reference-layout .obsidian-card-meta>span:nth-child(n+3){display:none}.reference-layout #detailDialog .reward-pool-list{grid-template-columns:1fr!important}.is-live-mission .dialog-shell{display:flex;flex-direction:column}.live-mission-pane .mission-rank{display:none}.live-mission-pane .mission-card{padding:12px!important}.live-mission-pane .mission-reward-grid{grid-template-columns:1fr 1fr}}
+
+/* 3.2.1: use the available screen width and keep the category rail readable. */
+.category-global-row{display:flex;align-items:center;gap:11px;padding:13px 14px;margin:0 0 6px;border-bottom:1px solid var(--line);background:var(--panel);cursor:pointer;color:var(--text)}
+.category-global-row>input{width:16px;height:16px;flex:none;margin:0;accent-color:var(--gold)}
+.category-global-row>span{min-width:0}.category-global-row strong{display:block;font:500 14px/1.4 Inter,system-ui,sans-serif}.category-global-row small{display:block;font:11px/1.5 Inter,system-ui,sans-serif;color:var(--muted);margin-top:3px}
+.reference-layout .category-global-row{position:sticky;top:0;z-index:2;border-radius:8px;flex:none}
+@media(min-width:1160px){
+ .reference-layout .app-shell{width:100%!important;max-width:none!important;padding:0 16px!important}
+ .reference-layout[data-layout=nocturne] .obsidian-workspace{grid-template-columns:minmax(0,1fr) clamp(280px,18vw,360px) minmax(var(--dossier-min),var(--dossier-width))!important}
+ .reference-layout .category-summary-copy strong{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
+}

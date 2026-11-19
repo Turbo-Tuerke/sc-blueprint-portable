@@ -1,0 +1,224 @@
+[
+  {
+    "id": "armor",
+    "label": "Rüstung",
+    "icon": "⬡",
+    "children": [
+      [
+        "armor-undersuits",
+        "Basisanzüge"
+      ],
+      [
+        "armor-helmets",
+        "Helme"
+      ],
+      [
+        "armor-torso",
+        "Brust"
+      ],
+      [
+        "armor-arms",
+        "Arme"
+      ],
+      [
+        "armor-legs",
+        "Beine"
+      ],
+      [
+        "armor-backpacks",
+        "Rucksäcke"
+      ],
+      [
+        "armor-flair",
+        "Flair"
+      ]
+    ]
+  },
+  {
+    "id": "clothing",
+    "label": "Kleidung",
+    "icon": "◇",
+    "children": [
+      [
+        "clothing-hats",
+        "Hüte"
+      ],
+      [
+        "clothing-tops",
+        "Oberteile"
+      ],
+      [
+        "clothing-jackets",
+        "Jacken"
+      ],
+      [
+        "clothing-gloves",
+        "Handschuhe"
+      ],
+      [
+        "clothing-pants",
+        "Hosen"
+      ],
+      [
+        "clothing-shoes",
+        "Schuhe"
+      ],
+      [
+        "clothing-glasses",
+        "Brillen"
+      ]
+    ]
+  },
+  {
+    "id": "weapons",
+    "label": "Waffen",
+    "icon": "⌁",
+    "children": [
+      [
+        "weapons-pistols",
+        "Pistolen"
+      ],
+      [
+        "weapons-longarms",
+        "Langwaffen"
+      ],
+      [
+        "weapons-special",
+        "Spezielles"
+      ],
+      [
+        "weapons-melee",
+        "Nahkampf"
+      ],
+      [
+        "weapons-attachments",
+        "Anbauteile"
+      ],
+      [
+        "weapons-throwables",
+        "Wurfwaffen"
+      ]
+    ]
+  },
+  {
+    "id": "tools",
+    "label": "Werkzeuge",
+    "icon": "⌕",
+    "children": [
+      [
+        "tools-tools",
+        "Werkzeuge"
+      ],
+      [
+        "tools-accessories",
+        "Zubehör"
+      ],
+      [
+        "tools-medical",
+        "Medizinisch"
+      ],
+      [
+        "tools-cryptokeys",
+        "CryptoKeys"
+      ],
+      [
+        "tools-technology",
+        "Technologie"
+      ]
+    ]
+  },
+  {
+    "id": "ammunition",
+    "label": "Munition",
+    "icon": "▥",
+    "children": [
+      [
+        "ammunition-all",
+        "Munition & Magazine"
+      ]
+    ]
+  },
+  {
+    "id": "vehicle",
+    "label": "Vehikel",
+    "icon": "➤",
+    "children": [
+      [
+        "vehicle-artillery",
+        "Artillerie"
+      ],
+      [
+        "vehicle-coolers",
+        "Kühler"
+      ],
+      [
+        "vehicle-emp",
+        "EMP"
+      ],
+      [
+        "vehicle-mining",
+        "Bergbau"
+      ],
+      [
+        "vehicle-mining-modules",
+        "Bergbau-Module"
+      ],
+      [
+        "vehicle-ore-pods",
+        "Erzbehälter"
+      ],
+      [
+        "vehicle-missile-racks",
+        "Raketengestelle"
+      ],
+      [
+        "vehicle-powerplants",
+        "Kraftwerke"
+      ],
+      [
+        "vehicle-quantumdrives",
+        "QT-Antriebe"
+      ],
+      [
+        "vehicle-shields",
+        "Schilde"
+      ],
+      [
+        "vehicle-turrets",
+        "Geschütze"
+      ],
+      [
+        "vehicle-weapons",
+        "Waffen"
+      ],
+      [
+        "vehicle-decoys",
+        "Täuschkörper"
+      ],
+      [
+        "vehicle-paints",
+        "Lackierungen"
+      ],
+      [
+        "vehicle-jumpmodules",
+        "Sprungmodule"
+      ],
+      [
+        "vehicle-radar",
+        "Radar"
+      ],
+      [
+        "vehicle-refuelling",
+        "Betankung"
+      ],
+      [
+        "vehicle-salvage",
+        "Bergung"
+      ],
+      [
+        "vehicle-tractorbeam",
+        "Traktorstrahl"
+      ]
+    ]
+  }
+]

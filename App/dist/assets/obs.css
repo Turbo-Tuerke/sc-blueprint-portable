@@ -1,0 +1,370 @@
+:root {
+  color-scheme: dark;
+  --cyan: #63e5ff;
+  --cyan-soft: rgba(99, 229, 255, 0.18);
+  --gold: #ffbd59;
+  --green: #5df0ae;
+  --text: #edfaff;
+  --muted: #91aebc;
+  --panel: rgba(3, 12, 19, 0.94);
+  --line: rgba(99, 229, 255, 0.25);
+  --cycle-seconds: 20s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+body {
+  color: var(--text);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  pointer-events: none;
+}
+
+.obs-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.mission-hud {
+  position: absolute;
+  left: clamp(28px, 3vw, 116px);
+  bottom: clamp(28px, 5vh, 108px);
+  width: min(72vw, 2300px);
+  min-width: 760px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(100deg, rgba(99, 229, 255, 0.07), transparent 28%),
+    var(--panel);
+  box-shadow: 0 24px 75px rgba(0, 0, 0, 0.48), inset 0 0 55px rgba(99, 229, 255, 0.025);
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+.mission-hud::before,
+.mission-hud::after {
+  position: absolute;
+  z-index: 3;
+  content: "";
+  background: var(--cyan);
+  box-shadow: 0 0 16px rgba(99, 229, 255, 0.6);
+}
+
+.mission-hud::before {
+  top: 0;
+  left: 0;
+  width: 210px;
+  height: 2px;
+}
+
+.mission-hud::after {
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  height: 2px;
+}
+
+.mission-hud.is-loading,
+.mission-hud.is-switching {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.hud-scan {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(99, 229, 255, 0.045) 49%, transparent 51%);
+  background-size: 100% 9px;
+  opacity: 0.36;
+}
+
+.hud-header,
+.hud-footer {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.hud-header {
+  min-height: 54px;
+  padding: 9px 20px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(99, 229, 255, 0.025);
+  font-size: clamp(12px, 0.72vw, 22px);
+}
+
+.hud-brand,
+.hud-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-logo {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(255, 189, 89, 0.5);
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.hud-status {
+  color: var(--green);
+}
+
+.hud-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 14px currentColor;
+}
+
+.hud-layout {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: minmax(230px, 28%) minmax(0, 1fr);
+  min-height: clamp(430px, 24vw, 720px);
+}
+
+.hud-image {
+  position: relative;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+  background:
+    linear-gradient(145deg, rgba(99, 229, 255, 0.11), rgba(2, 10, 16, 0.65)),
+    repeating-linear-gradient(90deg, transparent 0 31px, rgba(99, 229, 255, 0.035) 32px);
+}
+
+.hud-image::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(180deg, transparent 60%, rgba(2, 9, 14, 0.82));
+}
+
+.hud-image img {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(430px, 24vw, 720px);
+  object-fit: cover;
+  opacity: 0.92;
+}
+
+.hud-image.is-empty img {
+  display: none;
+}
+
+.hud-image.is-empty::before {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(99, 229, 255, 0.22);
+  content: "◇";
+  font: 92px "Cascadia Mono", Consolas, monospace;
+}
+
+.hud-image figcaption {
+  position: absolute;
+  z-index: 2;
+  right: 12px;
+  bottom: 10px;
+  color: var(--muted);
+  font: 11px "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
+.hud-content {
+  min-width: 0;
+  padding: clamp(22px, 2vw, 58px);
+}
+
+.hud-kicker-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--gold);
+  font: clamp(12px, 0.68vw, 21px) "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.09em;
+}
+
+.hud-content h1 {
+  margin: 9px 0 5px;
+  color: var(--text);
+  font-size: clamp(30px, 2.15vw, 72px);
+  font-weight: 760;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.hud-item-meta {
+  margin: 0;
+  color: var(--muted);
+  font: clamp(12px, 0.69vw, 22px) "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.hud-mission {
+  margin-top: 24px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(99, 229, 255, 0.14);
+}
+
+.hud-contractor {
+  color: var(--cyan);
+  font: clamp(12px, 0.66vw, 21px) "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hud-mission h2 {
+  margin: 6px 0 0;
+  color: var(--gold);
+  font-size: clamp(22px, 1.45vw, 50px);
+  font-weight: 650;
+  line-height: 1.12;
+}
+
+.hud-original {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: clamp(12px, 0.64vw, 19px);
+}
+
+.hud-description {
+  display: -webkit-box;
+  margin: 13px 0 0;
+  overflow: hidden;
+  color: #c8dce5;
+  font-size: clamp(15px, 0.88vw, 27px);
+  line-height: 1.5;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.hud-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  margin: 23px 0 0;
+  background: var(--line);
+}
+
+.hud-metrics > div {
+  min-width: 0;
+  padding: 10px 12px;
+  background: rgba(5, 20, 30, 0.96);
+}
+
+.hud-metrics dt {
+  color: var(--muted);
+  font: 11px "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.07em;
+}
+
+.hud-metrics dd {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: var(--text);
+  font: clamp(14px, 0.84vw, 26px) "Cascadia Mono", Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hud-metrics > div:first-child dd {
+  color: var(--gold);
+}
+
+.hud-footer {
+  min-height: 42px;
+  padding: 8px 20px 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: clamp(10px, 0.59vw, 18px);
+}
+
+.hud-footer span:first-child {
+  color: var(--cyan);
+}
+
+.hud-progress {
+  position: relative;
+  z-index: 5;
+  height: 3px;
+  background: rgba(99, 229, 255, 0.09);
+}
+
+.hud-progress i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  box-shadow: 0 0 14px rgba(99, 229, 255, 0.6);
+}
+
+.hud-progress i.is-running {
+  animation: cycle-progress var(--cycle-seconds) linear forwards;
+}
+
+@keyframes cycle-progress {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@media (max-width: 980px) {
+  .mission-hud {
+    left: 3vw;
+    width: 94vw;
+    min-width: 0;
+  }
+
+  .hud-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hud-image {
+    display: none;
+  }
+
+  .hud-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hud-footer span:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission-hud {
+    transition: none;
+  }
+}

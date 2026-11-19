@@ -1,0 +1,4 @@
+.mission-filter-panel{grid-column:1/-1;width:100%;padding:12px 0}.mission-filter-panel[hidden]{display:none!important}.mission-filter-help{color:var(--muted);font-size:.85rem;line-height:1.5;margin:0 0 16px}.mission-filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}.mission-filter-grid label{display:grid;gap:7px;font-size:.85rem}.mission-filter-grid select{width:100%;min-width:0;padding:10px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:8px}@media(max-width:900px){.mission-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:550px){.mission-filter-grid{grid-template-columns:1fr}}
+
+#facetBody.mission-mode>:not(#missionFilterPanel){display:none!important}
+body.mission-page #resetFiltersButton,body.mission-page #obsidianSize,body.mission-page .obsidian-armor{display:none!important}

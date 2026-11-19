@@ -1,0 +1,8 @@
+# Persönliche Daten jedes Nutzers (Einstellungen, Sammlung, Logfunde, Bilder)
+Daten/
+# Eingebettetes Python (kommt nur ins fertige ZIP-Paket)
+Runtime/
+__pycache__/
+*.pyc
+*.log
+.env
