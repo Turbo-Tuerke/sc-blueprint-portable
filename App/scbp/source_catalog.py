@@ -13,7 +13,7 @@ from pathlib import Path
 from .common import atomic_json, now, read_json, UUID
 from .mission_context import build_context, resolve_tokens
 
-SOURCE_SCHEMA = 13   # 11: translatedMissionLinks im _meta, 12: materialLocations (Fundorte aus mining_data), 13: ohne Launcher
+SOURCE_SCHEMA = 14   # 11: translatedMissionLinks im _meta, 12: materialLocations (Fundorte aus mining_data), 13: ohne Launcher, 14: englische Vorlagen und Kontext
 KEY_TABLE_PATH = Path(__file__).resolve().parent / 'key_table.json'
 # Katalogfelder, die beim Neubau aus dem vorherigen Snapshot erhalten bleiben (Beschreibung, Werte).
 CATALOG_FIELDS = ('descKey','description','divider','fix','grade','itemType','manufacturer','size')
@@ -121,6 +121,9 @@ def material_locations(mining):
     return dict(sorted(result.items()))
 
 
+# Englische Felder, die nur im vollständigen Auftrag stehen (nicht in den kompakten Item-Verweisen)
+EN_DETAIL = {'description','titleTemplate','descriptionTemplate','missionContext'}
+
 def input_fingerprint(crafting, profiles, contracts, language, seed, limit, fixed=None):
     # Only the retained identity map affects the next build, not the generated
     # timestamp or mission links of the previous snapshot.
@@ -221,8 +224,11 @@ def build_snapshot(crafting, profiles, contracts, language, seed, limit=12, fixe
         # Englische Fassung für die Sprachumschaltung (der Server legt sie bei ?lang=en / Cookie darüber)
         if translated:
             context_en=build_context(c,contracts,{},text)
+            # 6.0.1: auch Vorlagen (mit [TOKEN]) und Kontext englisch, sonst zeigt das Dossier deutschen Text
+            english['titleTemplate']=english['title'];english['descriptionTemplate']=english['description']
             english['title']=resolve_tokens(english['title'],context_en);english['description']=resolve_tokens(english['description'],context_en)
             m['en']={k:v for k,v in english.items() if v!=m.get(k)}
+            if context_en!=m['missionContext']:m['en']['missionContext']=context_en
         missions.append(m)
         for pool in pools:
             for e in pool['items']:
@@ -256,7 +262,7 @@ def build_snapshot(crafting, profiles, contracts, language, seed, limit=12, fixe
         linked=sorted(candidates.values(),key=lambda m:(not m['active'],-(m.get('combinedChancePercent') or 0),-(m.get('rewardUEC') or 0),m['title']))
         recipe={'tiers':[{'tier':i+1,'craftTimeSeconds':tier.get('craftTimeSeconds'),'slots':[{'name':s.get('name') or 'Material','options':[{**o,'name':o.get('resourceName') or o.get('itemName') or 'Unbekannt'} for o in s.get('options',[])]} for s in tier.get('slots',[])]} for i,tier in enumerate(bp.get('tiers',[]))]}
         translated_links+=sum(1 for m in linked[:limit] if (m.get('translation') or {}).get('translatedFields'))
-        compact_links=[{**{k:v for k,v in m.items() if k not in ('rewardPools','description','descriptionOriginal','titleOriginal','contractorOriginal','missionTypeOriginal','translation','debugNames','contractDefinitionIds','prerequisites','missionContext','titleTemplate','descriptionTemplate','en')},**({'en':{k:v for k,v in m['en'].items() if k!='description'}} if m.get('en') and any(k!='description' for k in m['en']) else {})} for m in linked[:limit]]
+        compact_links=[{**{k:v for k,v in m.items() if k not in ('rewardPools','description','descriptionOriginal','titleOriginal','contractorOriginal','missionTypeOriginal','translation','debugNames','contractDefinitionIds','prerequisites','missionContext','titleTemplate','descriptionTemplate','en')},**({'en':{k:v for k,v in m['en'].items() if k not in EN_DETAIL}} if m.get('en') and any(k not in EN_DETAIL for k in m['en']) else {})} for m in linked[:limit]]
         output.append({'name':name,'ini':ini,'matched':True,'blueprint':{'guid':bp['guid'],'tag':bp.get('tag'),'entityClass':uuid,'gear':bp.get('gear'),'type':bp.get('type'),'subtype':bp.get('subtype'),'manufacturer':bp.get('manufacturer'),'scmdbUrl':'https://scmdb.net/?page=fab&fab='+urllib.parse.quote(bp.get('tag') or '')},'profile':profile,'recipe':recipe,'missionCount':len(linked),'missions':compact_links})
         desc_key=str(stat.get('descKey') or '').lstrip('@');desc=text(keys.get(desc_key,{}).get('tr')) or stat.get('description','')
         entries.append({**stat,**profile,'entityClass':uuid,'nameKey':ini,'name':name,'description':desc})

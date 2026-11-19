@@ -531,7 +531,7 @@ function renderOverview() {
   document.getElementById("quickSync").textContent = elements.syncTimestamp.textContent;
   renderSyncBadge();
   const patch = state.catalog?._meta?.version_patch;
-  elements.footerVersion.textContent = patch ? `DASHBOARD 6.0.0 · CATALOG ${String(patch).toUpperCase()}` : "DASHBOARD 6.0.0";
+  elements.footerVersion.textContent = patch ? `DASHBOARD 6.0.1 · CATALOG ${String(patch).toUpperCase()}` : "DASHBOARD 6.0.1";
   renderActivityChart();
 }
 

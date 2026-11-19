@@ -154,13 +154,22 @@
       '.i18n-flags button:hover{opacity:.85}' +
       '@media (max-width:760px){.obsidian-overline{flex-wrap:wrap;row-gap:4px}.i18n-flags{margin-left:auto}.i18n-note{display:none!important}}' +
       '.i18n-note{display:inline-block;font-size:11px;letter-spacing:.02em;text-transform:none;opacity:.85;margin-right:4px;cursor:default}.i18n-note[hidden]{display:none}' +
-      '.i18n-note[data-state="ok"]{color:#6fcf97}.i18n-note[data-state="pending"]{color:#e5b46a}';
+      '.i18n-note[data-state="ok"]{color:#6fcf97}.i18n-note[data-state="pending"]{color:#e5b46a}' +
+      (lang === 'en' ? '.reference-layout #detailDialog .dialog-header>div:after{content:"Blueprint dossier"}' : '');
     document.head.appendChild(s);
+  }
+
+  // 6.0.1: Seitentitel („Einstellungen · SC Blueprint Dashboard“) teilweise übersetzen
+  function title() {
+    if (lang !== 'en') return;
+    var t = document.title.split(' · ').map(function (p) { return window.SCBP_I18N[p] || p; }).join(' · ');
+    if (t !== document.title) document.title = t;
   }
 
   function start() {
     css();
     place();
+    title();
     walk(document.body);
     new MutationObserver(function (list) {
       place();

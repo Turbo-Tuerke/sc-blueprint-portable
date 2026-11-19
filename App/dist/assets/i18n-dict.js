@@ -360,4 +360,87 @@
     [/Windows-Helfer derzeit nicht verbunden/g, 'Windows helper not connected', true], [/Zum Start den aktualisierten Windows-Helfer installieren\./g, 'Install the updated Windows helper to start.', true],
     [/Letzter PC-Kontakt:/g, 'Last PC contact:', true], [/Noch kein Kontakt/g, 'No contact yet', true], [/Direkter Logscanner/g, 'Direct log scanner', true]
   ]);
+  // 6.0.1: Dossier, Auftragskarten, Einzelversion und Seitentitel
+  add({
+    'Noch nicht erhalten': 'Not collected yet', 'Im Besitz': 'Owned', 'Synchronisiert': 'Synced', 'Manuell': 'Manual',
+    'Manuell gesetzt': 'Set manually', 'Spiel-Log bestätigt': 'Confirmed by game log',
+    'Logfund vorhanden · Übernehmen': 'Log find available · apply', 'Manuelle Änderung zurücksetzen': 'Reset manual change',
+    'Als Ziel markieren': 'Mark as goal', 'Sammelziel gesetzt': 'Collection goal set', 'Als Sammelziel setzen': 'Set as collection goal',
+    'Favorit gespeichert': 'Favourite saved', 'Als Favorit merken': 'Save as favourite', 'Favorit entfernen': 'Remove favourite',
+    'Im Vergleich': 'In comparison', 'In OBS anzeigen': 'Show in OBS',
+    'Gütegrad': 'Grade', 'INI-Schlüssel': 'INI key', 'Komponentenklasse': 'Component class',
+    'Eigene Bilder verwalten ↗': 'Manage your own images ↗',
+    'Verkaufsorte des Items. Ein Kauf schaltet den Bauplan nicht automatisch frei.': 'Where the item is sold. Buying it does not unlock the blueprint automatically.',
+    'Keine bestätigten Verkaufsorte in den ergänzenden Quellen.': 'No confirmed shops in the additional sources.',
+    'Noch keine externen Daten gespeichert.': 'No external data stored yet.',
+    'SCMDB · Deutsche Übersetzung': 'SCMDB · original text', 'SCMDB · Originalbeschreibung': 'SCMDB · original description',
+    'Auftragsdetails und Bauplan in OBS anzeigen': 'Show mission details and blueprint in OBS',
+    'Auftrag in SCMDB öffnen ↗': 'Open mission in SCMDB ↗', 'Auftrag in OBS anzeigen': 'Show mission in OBS',
+    'Diesen Auftrag in OBS anzeigen': 'Show this mission in OBS', 'Gruppe filtern': 'Filter group',
+    'Belohnung': 'Reward', 'Bauplan-Belohnungen': 'Blueprint rewards', 'Komponenten': 'Components', 'Bauplan-Pool': 'Blueprint pool',
+    'OFFEN': 'OPEN', 'UNBEKANNT': 'UNKNOWN', 'Bauplan erhalten': 'Blueprint collected', 'Bauplan offen': 'Blueprint open',
+    'Nicht im lokalen Katalog': 'Not in the local catalog',
+    'Jeder Pool wird unabhängig ausgewertet. Vollständig gesammelte Pools liefern keine weiteren Baupläne. Pool-Chance ≠ Chance auf ein bestimmtes Item.':
+      'Each pool is rolled independently. Fully collected pools give no further blueprints. Pool chance ≠ chance of a specific item.',
+    'SCMDB weist derzeit keinen Auftrag als Bauplanquelle aus.': 'SCMDB currently lists no mission as a blueprint source.',
+    '. Weitere Daten und Bilder gehören ihren Rechteinhabern (siehe': '. Other data and images belong to their owners (see',
+    'Lizenzen': 'Licences', '← Zurück zum Dashboard': '← Back to the dashboard',
+    // Einstellungen (Designs, Einzelversion)
+    'Kurze Auswahl, gefaltete Komponenten und aktive Filter.': 'Short selection, folded components and active filters.',
+    'Kupfer, ausgerichtete Komponenten und präzise Größenwahl.': 'Copper, aligned components and precise size selection.',
+    'Drei klare Schritte und eine ruhige Zusammenfassung.': 'Three clear steps and a calm summary.',
+    'Dieser PC': 'This PC', '02 Dieser PC & Pfade': '02 This PC & paths', 'Vom PC übernommen': 'Reported by this PC',
+    'Einzelversion für Windows: Das Dashboard läuft auf diesem PC und liest Game.log und LogBackups selbst. Kein NAS und kein zusätzlicher Helfer nötig.':
+      'Standalone version for Windows: the dashboard runs on this PC and reads Game.log and LogBackups itself. No NAS and no extra helper needed.',
+    'Einzelbetrieb: Daten werden direkt auf diesem PC gelesen.': 'Standalone mode: data is read directly on this PC.',
+    'Neue Bauplanmeldungen werden direkt aus dem Game.log auf diesem PC erkannt. Katalog und Übersetzungen lädt das Dashboard selbst aus dem Internet und hält sie aktuell.':
+      'New blueprint finds are detected directly from the Game.log on this PC. The dashboard downloads the catalog and translations itself and keeps them up to date.',
+    'Neue Pfade werden sofort auf diesem PC geprüft. Bei einem Fehler arbeitet der Log-Leser mit der letzten gültigen Konfiguration weiter.':
+      'New paths are checked immediately on this PC. On an error the log reader keeps working with the last valid configuration.',
+    'Spielmeldungen, Katalog und Übersetzungen werden auf diesem PC verarbeitet, solange das Dashboard läuft.':
+      'Game messages, catalog and translations are processed on this PC while the dashboard is running.',
+    'SCMDB liefert Fundwege und Belohnungs-Pools. Die deutsche Sprachdatei ergänzt Aufträge und Quellen. Bilder werden über UUID-geprüfte Wiki-Seiten oder Cornerstone zugeordnet und dauerhaft gespeichert. Fehlende Übersetzungen bleiben erkennbar.':
+      'SCMDB provides ways to find and reward pools. The German language file adds missions and sources. Images are matched via UUID-checked wiki pages or Cornerstone and stored permanently. Missing translations stay visible.',
+    'Bildarchiv & eigene Bilder ↗': 'Image archive & own images ↗', 'Vorschau · noch nicht gespeichert': 'Preview · not saved yet',
+    // OBS, Logscanner, Bilder, Live
+    'Dein vorhandener Bestand ist die Ausgangsbasis. Neue Funde erscheinen hier automatisch.': 'Your existing collection is the baseline. New finds appear here automatically.',
+    'Neue und historische Fundmeldungen erscheinen nach dem ersten Scan hier.': 'New and historical finds appear here after the first scan.',
+    'Noch keine Aufträge aus dem Log erfasst.': 'No missions recorded from the log yet.',
+    'Offline-Modus · gespeicherte Bilder bleiben verfügbar.': 'Offline mode · stored images remain available.',
+    'Keine offenen Live-Aufträge. Neue Annahmen erscheinen nach dem Logscan hier.': 'No open live missions. Newly accepted missions appear here after the log scan.',
+    // Seitentitel (Teile zwischen " · ")
+    'Deine Sammlung': 'Your collection', 'Datenquellen': 'Data sources', 'Bildarchiv': 'Image archive',
+    // Online-Dossier (Quellenprüfung, Bilder)
+    'QUELLEN WERDEN GEPRÜFT': 'CHECKING SOURCES', 'Herkunft & Bildzuordnung': 'Origin & image matching',
+    'Wiki-API-Bild nicht übernommen: Auf der UUID-geprüften Itemseite ist kein passendes Bild hinterlegt.':
+      'Wiki API image not used: the UUID-checked item page has no matching image.'
+  });
+  // Ganze Texte mit Zahlen: vorne einreihen, damit allgemeinere Muster (z. B. „a / b“) nicht zuerst greifen
+  var Q = function (s) { return s.replace(/(\d+) Min (\d+) Sek/, '$1 min $2 s').replace(/(\d+) Min\b/, '$1 min').replace(/(\d+) Sek\b/, '$1 s'); };
+  window.SCBP_I18N_RULES.unshift(
+    // Item-Zusammenfassung aus mehreren Sätzen (app.js createScmdbSummary)
+    [/^(?:SCMDB klassifiziert das Item als |Als Hersteller ist |Die Fertigungszeit beträgt |[\d.]+ Aufträge können |SCMDB weist derzeit )[\s\S]*$/, function (m) {
+      return m.replace(/SCMDB klassifiziert das Item als (.+?)\.(?= |$)/, 'SCMDB classifies the item as $1.')
+        .replace(/Als Hersteller ist (.+?) hinterlegt\./, 'Manufacturer: $1.')
+        .replace(/Die Fertigungszeit beträgt (.+?)\.(?= |$)/, function (x, d) { return 'Crafting time: ' + Q(d) + '.'; })
+        .replace(/([\d.]+) Aufträge können einen passenden Bauplan-Pool auslösen\./, '$1 missions can trigger a matching blueprint pool.')
+        .replace(/SCMDB weist derzeit keinen Auftrag als Bauplanquelle aus\./, 'SCMDB currently lists no mission as a blueprint source.');
+    }],
+    [/^(\d+)\/(\d+) bereits erhalten$/, '$1/$2 already collected'],
+    [/^(.+?) · Qualität (.+)$/, '$1 · quality $2'],
+    [/^([\d.]+) AUFTRÄGE$/, '$1 MISSIONS'], [/^1 AUFTRAG$/, '1 MISSION'],
+    [/^Browserquelle: (\d+) × (\d+) Pixel$/, 'Browser source: $1 × $2 pixels'],
+    [/^Letzter Abruf: (.+)$/, 'Last fetched: $1'],
+    [/^Bild (\d+) in Originalgröße öffnen$/, 'Open image $1 at full size'],
+    [/^(Gespeicherter Stand · Quelle offline|Gespeicherter Stand|Geprüft|Derzeit nicht abrufbar) · (.+)$/, function (m, a, d) {
+      return {'Gespeicherter Stand · Quelle offline': 'Stored copy · source offline', 'Gespeicherter Stand': 'Stored copy', 'Geprüft': 'Checked', 'Derzeit nicht abrufbar': 'Currently unavailable'}[a] + ' · ' + d; }]
+  );
+  window.SCBP_I18N_RULES.push(
+    [/^Schließe einen der folgenden Aufträge ab\. Jeder Abschluss würfelt die angezeigten Bauplan-Pools unabhängig voneinander aus\. Sobald du alle Baupläne eines Pools besitzt, liefert dieser Pool keine weiteren Baupläne\. Titel und Beschreibungen verwenden bevorzugt die deutsche Star-Citizen-Sprachdatei\.(?: Angezeigt werden die (\d+) aussichtsreichsten Fundwege\.)?$/,
+      function (m, n) { return 'Complete one of the following missions. Each completion rolls the shown blueprint pools independently. Once you own all blueprints of a pool, that pool gives no further blueprints.' + (n ? ' Showing the ' + n + ' most promising sources.' : ''); }],
+    [/Game\.log noch nicht vorhanden\. Warte auf den Spielstart\./g, 'Game.log not found yet. Waiting for the game to start.', true],
+    [/^Logscanner:/g, 'Log scanner:', true], [/Letzter Kontakt:/g, 'Last contact:', true],
+    [/Windows-Helfer verbunden/g, 'Windows helper connected', true],
+    [/Katalog und deutsche Aufträge auf der Synology aktualisiert\./g, 'Catalog and German missions updated.', true]
+  );
 })();
