@@ -12,7 +12,7 @@ const fields=[
  ['appearanceFields','appearance','fontSize','Schriftgröße','number',[14,20],'14–20 Pixel als Grundgröße.'],
  ['appearanceFields','appearance','animations','Animationen aktivieren','checkbox'],
  ['pathFields','paths','scRoot','Star-Citizen-Stammordner','text'],
- ['pathFields','paths','channel','Spielkanal','select',['LIVE','HOTFIX','PTU','EPTU','TECH-PREVIEW'].map(x=>[x,x])],
+ ['pathFields','paths','channel','Spielkanal','select',['LIVE','HOTFIX','PTU','EPTU','TECH-PREVIEW'].map(x=>[x,x==='LIVE'?'LIVE & HOTFIX':x])],
  ['pathFields','paths','logs','Star-Citizen-Logs','text',null,'Trace-Ordner als Referenz. Der direkte Scanner liest die unten angegebenen Game.log-Dateien.','wide'],
  ['scannerFields','scanner','gameLog','Aktuelle Game.log','text',null,'Wird auf deinem Windows-PC gelesen.','wide'],
  ['scannerFields','scanner','backups','Historische LogBackups','text',null,'Historische Funde ergänzen den Bestand ohne OBS-Einblendung.','wide'],

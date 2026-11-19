@@ -96,6 +96,20 @@ def detect_sc_root(channel='LIVE'):
     return candidates[0] if os.name == 'nt' else Path.home() / 'Games/star-citizen/drive_c/Program Files/Roberts Space Industries/StarCitizen'
 
 
+def hotfix_source(cfg):
+    """6.0.2: Bei LIVE auch HOTFIX lesen (Game.log und LogBackups) und als LIVE melden, wie der Windows-Helfer."""
+    if cfg['paths']['channel'] != 'LIVE':
+        return None
+    live = expand(cfg['scanner']['gameLog'])
+    if not live or live.parent.name != 'LIVE':
+        return None
+    folder = live.parent.parent / 'HOTFIX'
+    if not folder.is_dir():
+        return None
+    backups = next((folder / n for n in ('LogBackups', 'logbackups') if (folder / n).is_dir()), folder / 'LogBackups')
+    return folder / 'Game.log', backups
+
+
 def standalone_defaults(defaults):
     """Startwerte beim ersten Start der Einzelversion."""
     settings = copy.deepcopy(defaults)
@@ -210,17 +224,29 @@ class LocalAgent:
             # damit jeder Fund einem Item zugeordnet werden kann. Erster Durchlauf bleibt „historisch“.
             self.status.update({'status': 'waiting', 'message': 'Itemkatalog wird aus dem Internet geladen. Danach werden Game.log und LogBackups gelesen.'})
             return
+        hotfix = hotfix_live = None
         try:
             if live and live.is_file():
                 for _ in range(32):
                     if self.read_block(live, False) == 0:
                         break
+            hotfix = hotfix_source(cfg)
+            hotfix_live = hotfix[0] if hotfix and hotfix[0].is_file() else None
+            if hotfix_live:
+                for _ in range(32):
+                    if self.read_block(hotfix_live, False) == 0:
+                        break
             pending = processed = 0
             budget = BACKUP_BUDGET
             backups = expand(cfg['scanner']['backups'])
-            if cfg['scanner']['scanBackups'] and backups and backups.is_dir():
+            if cfg['scanner']['scanBackups']:
+                files = [p for p in backups.glob('*.log') if p.is_file()] if backups and backups.is_dir() else []
+                if hotfix and hotfix[1].is_dir():
+                    # Kopien der LIVE-Sicherungen (gleicher Name, gleiche Groesse) nicht noch einmal lesen.
+                    known = {(p.name, p.stat().st_size) for p in files}
+                    files += [p for p in hotfix[1].glob('*.log') if p.is_file() and (p.name, p.stat().st_size) not in known]
                 # 5.6.3: Neueste Sitzungen zuerst, damit neue Nutzer ihren Besitz nach Minuten statt nach einer halben Stunde sehen.
-                files = sorted((p for p in backups.glob('*.log') if p.is_file()), key=lambda p: p.stat().st_mtime, reverse=True)
+                files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
                 for file in files:
                     key = cfg['paths']['channel'] + '|' + str(file)
                     entry = self.files.get(key)
@@ -239,7 +265,7 @@ class LocalAgent:
                         pending += 1
                     else:
                         processed += 1
-            exists = bool(live and live.is_file())
+            exists = bool(live and live.is_file()) or bool(hotfix_live)
             self.status['pendingFiles'] = pending
             self.status['processedFiles'] = processed
             self.status['status'] = 'importing' if pending else ('watching' if exists else 'waiting')

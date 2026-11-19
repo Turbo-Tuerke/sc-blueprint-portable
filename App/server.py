@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent
 DATA = Path(os.environ.get('SCBP_DATA', ROOT / 'data'))
 STATE = Path(os.environ.get('SCBP_STATE', ROOT / 'state'))
 MEDIA = Path(os.environ.get('SCBP_MEDIA', ROOT / 'media'))
-VERSION = '6.0.1'
+VERSION = '6.0.2'
 # 5.0: SCBP_MODE=standalone -> Einzelversion für Windows/Bazzite (kein NAS, integrierter Log-Leser)
 STANDALONE = os.environ.get('SCBP_MODE','').lower()=='standalone'
 THEMES = ['aurum','polaris','sentinel','obsidian','atlas','vanguard','aurora','eclipse','forge','meridian','halo','nocturne']
