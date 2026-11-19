@@ -4,7 +4,7 @@
 
 Inoffizielles Fan-Werkzeug für Star Citizen. Es zeigt alle Baupläne (Blueprints), in welchen Aufträgen du sie bekommst, wo du die Materialien findest und welche Baupläne du schon hast. Neue Funde erkennt es automatisch aus dem `Game.log` des Spiels; für den Stream gibt es eine OBS-Einblendung.
 
-*Unofficial Star Citizen fan tool: tracks your blueprints, the contracts that reward them and where to mine their materials. Reads your own `Game.log`, runs locally on Windows, German and English interface.*
+*Unofficial Star Citizen fan tool: tracks your blueprints, the contracts that reward them and where to mine their materials. Reads your own `Game.log`, runs locally on Windows, German and English interface. English guide with screenshots: [Installation-Guide.pdf](Installation-Guide.pdf).*
 
 ## Fertiges Programm
 
