@@ -14,6 +14,12 @@ Die einfachste Variante ist das fertige ZIP-Paket (mit eingebautem Python):
 2. `Start.cmd` doppelt anklicken. Die Seite öffnet sich unter <http://127.0.0.1:8188/>.
 3. Zum Beenden `Beenden.cmd` doppelt anklicken.
 
+Preview (English)
+https://github.com/user-attachments/assets/95c19614-c791-4c1b-9478-d56e96fa4c06
+
+Vorschau (Deutsch)
+https://github.com/user-attachments/assets/4fac5d1a-7894-4d60-9ad3-5a6504fccf76
+
 Ausführlich mit Bildern: [Installationsanleitung.pdf](Installationsanleitung.pdf). Kurzfassung: [LIES MICH.txt](LIES%20MICH.txt).
 
 ## Aus diesem Quellstand starten
