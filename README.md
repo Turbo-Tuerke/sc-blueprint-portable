@@ -33,11 +33,16 @@ Es werden keine weiteren Pakete benötigt.
 - Besitz entsteht aus deinem eigenen `Game.log` und den `LogBackups`; einzelne Items lassen sich im Dossier von Hand markieren.
 - Alle persönlichen Daten liegen im Ordner `Daten` neben `App`.
 
-Preview (English)
+## Vorschau / Preview
+
+**Deutsch**
+
+https://github.com/user-attachments/assets/4fac5d1a-7894-4d60-9ad3-5a6504fccf76
+
+**English**
+
 https://github.com/user-attachments/assets/95c19614-c791-4c1b-9478-d56e96fa4c06
 
-Vorschau (Deutsch)
-https://github.com/user-attachments/assets/4fac5d1a-7894-4d60-9ad3-5a6504fccf76
 
 ## Lizenzen
 
