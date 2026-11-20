@@ -25,6 +25,9 @@ Projekts.
 | --- | --- |
 | Schrift Inter (`dist/assets/fonts/inter-*`) | SIL Open Font License 1.1, `LICENSE-inter.txt` |
 | Schrift Rajdhani (`dist/assets/fonts/rajdhani-*`) | SIL Open Font License 1.1, `LICENSE-rajdhani.txt` |
+| Schrift Caveat (`dist/assets/fonts/caveat-*`, Akte der Live-Aufträge) | SIL Open Font License 1.1, `LICENSE-caveat.txt` |
+| Schrift UnifrakturMaguntia (`dist/assets/fonts/unifrakturmaguntia-*`) | SIL Open Font License 1.1, `LICENSE-unifrakturmaguntia.txt` |
+| Schrift Special Elite (`dist/assets/fonts/special-elite-*`) | Apache License 2.0, `LICENSE-special-elite.txt` |
 
 Python wird nicht mitgeliefert. Die Windows-Einzelversion lädt beim ersten
 Start das offizielle Paket von python.org (Python Software Foundation License).

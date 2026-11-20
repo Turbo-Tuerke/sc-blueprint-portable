@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent
 DATA = Path(os.environ.get('SCBP_DATA', ROOT / 'data'))
 STATE = Path(os.environ.get('SCBP_STATE', ROOT / 'state'))
 MEDIA = Path(os.environ.get('SCBP_MEDIA', ROOT / 'media'))
-VERSION = '6.0.2'
+VERSION = '6.0.9'
 # 5.0: SCBP_MODE=standalone -> Einzelversion für Windows/Bazzite (kein NAS, integrierter Log-Leser)
 STANDALONE = os.environ.get('SCBP_MODE','').lower()=='standalone'
 THEMES = ['aurum','polaris','sentinel','obsidian','atlas','vanguard','aurora','eclipse','forge','meridian','halo','nocturne']
@@ -53,6 +53,38 @@ def read_json(path, fallback=None):
  try: return json.loads(path.read_text('utf-8-sig'))
  except (OSError,ValueError): return copy.deepcopy(fallback)
 def write_json(path,value): atomic_json(path,value)
+
+
+# 6.0.7: Akte als eigene OBS-Quelle (/obs-akte.html). Das Dashboard meldet, welche Akte sichtbar ist
+# und welche Seite aufgeschlagen ist; die Quelle fragt den Stand ab und blättert mit.
+def obs_akte_update(current,body,scanner):
+    out=dict(current or {})
+    if 'visible' in body:
+        if type(body['visible']) is not bool:raise ValueError('Sichtbarkeit fehlt.')
+        out['visible']=body['visible']
+    if 'guid' in body:
+        guid=body['guid']
+        if not isinstance(guid,str) or not guid or len(guid)>200:raise ValueError('Auftragskennung fehlt.')
+        if guid!=out.get('guid'):
+            if not scanner.instance(guid):raise ValueError('Auftrag nicht gefunden.')
+            out={'visible':out.get('visible',False),'guid':guid,'state':0}
+    if 'state' in body:
+        if type(body['state']) is not int or not 0<=body['state']<=5:raise ValueError('Ungültige Seite.')
+        out['state']=body['state']
+    if 'row' in body:
+        row=body['row']
+        if not isinstance(row,dict):raise ValueError('Auftragsdaten fehlen.')
+        out['row']={k:str(row[k])[:64] for k in ('guid','start','end','status') if row.get(k) is not None}
+    if 'heft' in body:
+        if type(body['heft']) is not int or body['heft']<0:raise ValueError('Ungültige Heftnummer.')
+        out['heft']=body['heft']
+    if 'session' in body:
+        rows=body['session']
+        if not isinstance(rows,list) or len(rows)>60:raise ValueError('Sitzungsdaten fehlen.')
+        out['session']=[{'guid':str(r.get('guid',''))[:200],'start':str(r.get('start',''))[:64],'status':str(r.get('status',''))[:32],
+                         'mission':{'title':str((r.get('mission') or {}).get('title') or r.get('title') or '')[:300]}} for r in rows if isinstance(r,dict)]
+    out['updatedAt']=now()
+    return out
 def init_state():
  STATE.mkdir(parents=True,exist_ok=True)
  with LOCK:
@@ -322,8 +354,9 @@ class Handler(SimpleHTTPRequestHandler):
  def reply(self,obj,status=200):
   if self.command=='GET' and self.lang()=='en' and isinstance(obj,(dict,list)):obj=english_cached(obj)
   raw=json.dumps(obj,ensure_ascii=False,separators=(',',':')).encode()
-  compressed=len(raw)>262144 and 'gzip' in self.headers.get('Accept-Encoding','')
-  if compressed:raw=gzip.compress(raw)
+  # 6.0.5: JSON ab 1 KB packen (vorher erst ab 256 KB); Stufe 5 ist schnell und spart rund 80 %
+  compressed=len(raw)>=1024 and 'gzip' in self.headers.get('Accept-Encoding','')
+  if compressed:raw=gzip.compress(raw,5)
   self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Cache-Control','no-store');self.send_header('Vary','Accept-Encoding')
   if compressed:self.send_header('Content-Encoding','gzip')
   self.send_header('Content-Length',str(len(raw)));self.end_headers()
@@ -368,7 +401,15 @@ class Handler(SimpleHTTPRequestHandler):
    if path.startswith('/api/missions/instance/'):
     mission=svc['scanner'].instance(urllib.parse.unquote(path.rsplit('/',1)[-1]));return self.reply({'mission':mission})
    if path=='/api/missions/templates':return self.reply({'missions':svc['catalog'].mission_templates()})
-   if path=='/api/missions/active':return self.reply(svc['scanner'].active_missions())
+   if path=='/api/missions/active':
+    try:limit,offset=int(q.get('limit',['50'])[0]),int(q.get('offset',['0'])[0])
+    except ValueError:raise ValueError('Ungültige Seite.')
+    data=svc['scanner'].active_missions(limit,offset,q.get('view',['full'])[0])
+    # 6.0.5: Revision über den Inhalt; unverändert → nur eine kurze Antwort statt der ganzen Liste
+    revision=hashlib.sha256(json.dumps(data,sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:20]
+    if q.get('since',[''])[0]==revision:return self.reply({'unchanged':True,'revision':revision})
+    return self.reply({**data,'revision':revision})
+   if path=='/api/journal':return self.reply(svc['scanner'].journal(q.get('from',[''])[0],q.get('to',[''])[0]))
    if path=='/api/missions/live':return self.reply(svc['scanner'].live_missions(int(q.get('after',['0'])[0])))
    if path=='/api/sources/catalog':return self.reply(svc['sources'].status())
    if path=='/api/catalog/data':return self.reply(svc['sources'].active_snapshot() or svc['sources'].legacy_snapshot())
@@ -389,9 +430,15 @@ class Handler(SimpleHTTPRequestHandler):
       except (ValueError,KeyError):item['images']=[]
     return self.reply(result)
    if path=='/api/obs/history':return self.reply(svc['alerts'].history())
-   if path=='/api/ships':
-    try:return self.reply(svc['media'].ships())
-    except Exception as e:return self.reply({**read_json(STATE/'ships.json',{'ships':[]}),'error':str(e)[:200]})
+   if path=='/api/obs/akte':
+    state=read_json(STATE/'obs-akte.json',{}) or {}
+    revision=hashlib.sha256(json.dumps(state,sort_keys=True).encode()).hexdigest()[:16]
+    if q.get('since',[''])[0]==revision:return self.reply({'unchanged':True,'revision':revision})
+    return self.reply({'visible':False,**state,'revision':revision})
+   if path=='/api/obs/state':
+    try:event_id=int(q.get('event',[''])[0])
+    except ValueError:raise ValueError('Einblendung fehlt.')
+    return self.reply({'event':event_id,'active':svc['alerts'].active(event_id)})
    if path.startswith('/api/'):return self.reply({'error':'Endpunkt nicht gefunden.'},404)
    if self.serve_static():return
    return super().do_GET()
@@ -480,6 +527,13 @@ class Handler(SimpleHTTPRequestHandler):
     return self.reply({'ok':True,'event':ident})
    if path=='/api/missions/close':return self.reply(svc['scanner'].close_mission(body))
    if path=='/api/obs/clear':svc['alerts'].clear();return self.reply({'ok':True})
+   if path=='/api/obs/akte':
+    with LOCK:
+     state=obs_akte_update(read_json(STATE/'obs-akte.json',{}),body,svc['scanner']);write_json(STATE/'obs-akte.json',state)
+    return self.reply({'ok':True,'akte':state})
+   if path=='/api/obs/hide':
+    if type(body.get('event')) is not int:raise ValueError('Einblendung fehlt.')
+    return self.reply({'ok':True,'hidden':svc['alerts'].hide(body['event'])})
    if path=='/api/obs':
     kind=body.get('kind')
     if kind not in ['item','mission','mission-details','mission-brief','archive-mission','found-item','cycle']:raise ValueError('Ungültige OBS-Auswahl.')
@@ -493,7 +547,8 @@ class Handler(SimpleHTTPRequestHandler):
      else:
       template=svc['scanner'].instance(body.get('guid'))
       if not template:raise ValueError('Archivauftrag nicht eindeutig zugeordnet.')
-      svc['alerts'].enqueue([{'name':template.get('title'),'description':template.get('description'),'missionDetails':template}],'mission-brief',template.get('title') or '')
+      event_id=svc['alerts'].enqueue([{'name':template.get('title'),'description':template.get('description'),'missionDetails':template}],'mission-brief',template.get('title') or '',persistent=body.get('persistent') is True)
+      result['event']=event_id
     if kind=='item':svc['alerts'].enqueue([svc['catalog'].get(result['item'])],'manual',result['title'])
     if kind=='mission':
      svc['alerts'].enqueue(mission_rewards(svc['catalog'],result['mission']),'mission',result['title'])

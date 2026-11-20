@@ -48,7 +48,7 @@
     'Wähle oben einen Ausrüstungstyp. Danach erscheinen genau die dazu passenden Zusatzfilter.':
       'Choose an equipment type above. The matching extra filters then appear.',
     'Minimale Größe': 'Minimum size', 'Maximale Größe': 'Maximum size', 'Größe von': 'Size from', 'Größe bis': 'Size to',
-    'Mit Detaildaten': 'With detail data', 'Alle sichtbaren auswählen': 'Select all visible', 'DEINE AUSWAHL': 'YOUR SELECTION',
+    'Mit Detaildaten': 'With detail data', 'Alle sichtbaren auswählen': 'Select all visible', 'Akten pro Seite': 'Files per page', 'Akte als eigene Quelle': 'File as its own source', 'Zeigt die Akte eines Live-Auftrags mittig im Bild und blättert mit, wenn du im Dashboard blätterst. Eingeblendet wird sie in der geöffneten Akte mit „OBS-Einblenden“, ausgeblendet mit „OBS-Ausblenden“.': 'Shows the file of a live mission centred on screen and turns its pages when you turn them in the dashboard. Show it from the open file with “Show in OBS”, hide it with “Hide in OBS”.', 'In OBS eine weitere „Browser“-Quelle hinzufügen.': 'Add another “Browser” source in OBS.', 'Die folgende Adresse einfügen, Breite 1920 und Höhe 1080 einstellen.': 'Paste the address below and set width 1920 and height 1080.', 'Akte-Quelle öffnen ↗': 'Open file source ↗', '‹ Zurück': '‹ Back', 'Weiter ›': 'Next ›', 'DEINE AUSWAHL': 'YOUR SELECTION',
     'Alle Baupläne · keine Einschränkung': 'All blueprints · no restriction', 'Nur für meine Sammelziele': 'Only for my collection goals',
     // Aufträge
     'Aufträge': 'Missions', 'Aktive Aufträge': 'Active missions', 'Nur aktive Aufträge': 'Active missions only',
@@ -144,6 +144,10 @@
     [/^Alle schließen \((\d+)\)$/, 'Close all ($1)'],
     [/^Auswahl schließen \((\d+)\)$/, 'Close selection ($1)'],
     [/^LIVE · (\d+) von (\d+) offenen Einträgen sichtbar · maximal (\d+)\.$/, 'LIVE · $1 of $2 open entries visible · max. $3.'],
+    // 6.0.4: Seiten der Live-Aufträge
+    [/^([A-Z-]+) · Einträge (\d+)–(\d+) von (\d+) · Seite (\d+) von (\d+)\.$/, '$1 · entries $2–$3 of $4 · page $5 of $6.'],
+    [/^([A-Z-]+) · keine offenen Einträge\.$/, '$1 · no open entries.'],
+    [/^Seite (\d+) von (\d+)$/, 'Page $1 of $2'],
     [/^Quelle: SCMDB · Spielversion (.+?)\. Enthält auch Aufträge ohne Bauplanbelohnungen und bereits vollständig gesammelte Belohnungspools\. Der Status „aktiv“ beschreibt den Katalog, nicht deinen persönlichen Auftragsverlauf\.$/,
       'Source: SCMDB · game version $1. Also lists missions without blueprint rewards and fully collected reward pools. “Active” describes the catalog, not your personal mission history.'],
     [/^Zusatzinformationen: (.+)$/, 'Additional info: $1'],
@@ -298,8 +302,6 @@
     'Dossier-Hintergrund transparent': 'Transparent dossier background', 'Dossier · ausführliche Ansicht': 'Dossier · detailed view', 'Dossier-Ansicht öffnen ↗': 'Open dossier view ↗',
     'Zusätzliche Dossier-Browserquelle': 'Extra dossier browser source', 'Kompakte Bauplan-Leiste': 'Compact blueprint bar', 'Ansicht öffnen ↗': 'Open view ↗', 'Öffnen ↗': 'Open ↗',
     'Die Leiste liegt am unteren Bildrand; Dossier zeigt die ausführlichen Auftragsdaten.': 'The bar sits at the bottom edge; the dossier shows detailed mission data.',
-    'Optional kannst du unter /showcase.html weiterhin Items und Aufträge dauerhaft als Dossier oder kompakte Ansicht zeigen. Automatische Fundmeldungen laufen separat unter /obs.html.':
-      'Optionally you can keep showing items and missions permanently as a dossier or compact view at /showcase.html. Automatic find alerts run separately at /obs.html.',
     'Neue Baupläne erscheinen automatisch in deiner OBS-Browserquelle. Einzelne Funde oder mehrere zusammen – standardmäßig 15 Sekunden, danach wieder vollständig transparent.':
       'New blueprints appear automatically in your OBS browser source. Single finds or several together – 15 seconds by default, then fully transparent again.',
     'Neue Baupläne werden nach dem Einlesen automatisch in der OBS-Browserquelle eingeblendet. Mehrere gleichzeitige Funde erscheinen in Gruppen. „In OBS anzeigen“ fügt zusätzlich eine manuelle Einblendung hinzu.':

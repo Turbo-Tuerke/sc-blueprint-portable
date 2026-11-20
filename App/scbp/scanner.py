@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from .common import now
 from .source_catalog import load_name_aliases
+from . import journal
 
 STAMP = re.compile(r'^<([0-9T:\-.Z]+)>')
 MARKER = re.compile(r'CreateMarker.*missionId \[([^\]]+)\].*generator name \[([^\]]+)\].*contract \[([^\]]+)\]')
@@ -42,7 +43,8 @@ def effective_mode(cfg):
     # 5.6.0: Ohne Launcher gibt es nur noch eine Besitzquelle: das Game.log.
     return 'logs'
 
-LIVE_LIMIT=50  # sichtbare Live-Aufträge (vor 4.1.7: 20)
+LIVE_LIMIT=50  # Standard-Seitengröße der Live-Aufträge (vor 4.1.7: 20)
+LIVE_PAGE_SIZES=(10,20,50,100,150,200)  # 6.0.4: Akten pro Seite, keine feste Obergrenze mehr
 OPEN_MISSIONS="m.channel=? AND m.start IS NOT NULL AND m.status!='Abandon' AND NOT EXISTS(SELECT 1 FROM mission_closed c WHERE c.channel=m.channel AND c.guid=m.guid)"
 
 class Scanner:
@@ -59,7 +61,7 @@ class Scanner:
             CREATE TABLE IF NOT EXISTS scan_batches(id TEXT PRIMARY KEY,at TEXT);
             CREATE TABLE IF NOT EXISTS scan_events(id TEXT PRIMARY KEY,channel TEXT,kind TEXT,ts TEXT,name TEXT,ini TEXT,historical INTEGER,mission TEXT,source TEXT,status TEXT);
             CREATE TABLE IF NOT EXISTS scan_missions(channel TEXT,guid TEXT,debug TEXT,definition TEXT,status TEXT,start TEXT,end TEXT,PRIMARY KEY(channel,guid));
-            ''')
+            '''+journal.SCHEMA)
         self.seed()
 
     @contextmanager
@@ -171,6 +173,11 @@ class Scanner:
                     if acceptance or status=='Complete':
                         context['recent'].append({**entry,'epoch':epoch,'trigger':'accept' if acceptance else 'complete'})
                         context['recent']=context['recent'][-32:]
+                    continue
+                # 6.0.3: Ladenkäufe und Reise-Meldungen für Seite 5 der Akte
+                entry=journal.parse(line)
+                if entry:
+                    journal.store(db,channel,timestamp,epoch,entry,event_key)
                     continue
                 match=BLUEPRINT.search(line)
                 if not match:continue
@@ -304,16 +311,56 @@ class Scanner:
             row['matched']=bool(row['mission'])
         return {'channel':channel,'latest':latest,'cursor':rows[-1]['seq'] if rows else max(after,latest),'events':rows}
 
-    def active_missions(self):
+    def journal(self,start,end):
+        """6.0.3: Ausgaben und Reiseverlauf zwischen zwei Zeitpunkten (ISO, UTC)."""
+        for value in (start,end):
+            if not isinstance(value,str) or not re.fullmatch(r'\d{4}-\d\d-\d\dT[0-9:.]+Z?',value):raise ValueError('Ungültiger Zeitraum.')
+        channel=self.settings()['paths']['channel']
+        with self.db() as db:return {'channel':channel,'from':start,'to':end,'entries':journal.query(db,channel,start,end)}
+
+    MINI_FIELDS=('id','debugName','title','contractor','illegal','category','missionType','logInstance')
+    def blueprint_count(self,mission):
+        """6.0.5: Bauplan-Stand eines Auftrags (erhalten/gesamt, ohne doppelte Items) für die Miniatur-Akte."""
+        items=self.catalog.refresh() or []
+        sig=getattr(self.catalog,'signature',None)
+        if getattr(self,'_bp_index_sig',object())!=sig:
+            uuid,bp,names={},{},{}
+            for i in items:
+                if i.get('uuid'):uuid[i['uuid']]=i
+                if i.get('blueprint'):bp[i['blueprint']]=i
+                n=normalized(i.get('name') or '');names[n]=None if n in names else i
+            self._bp_index=(uuid,bp,names);self._bp_index_sig=sig
+        uuid,bp,names=self._bp_index
+        seen={}
+        for pool in mission.get('rewardPools') or []:
+            for entry in pool.get('items') or []:
+                item=uuid.get(entry.get('entityClass')) or bp.get(entry.get('blueprintRecord')) or names.get(normalized(entry.get('name') or ''))
+                key=item['id'] if item else normalized(entry.get('name') or '')
+                if key not in seen:seen[key]=(entry.get('name'),bool(item and item.get('isDone')))
+        return {'ok':sum(1 for _,done in seen.values() if done),'total':len(seen),'open':[n for n,done in seen.values() if not done][:6]}
+    def mini_mission(self,mission):
+        if not mission:return mission
+        out={k:mission[k] for k in self.MINI_FIELDS if k in mission}
+        en=mission.get('en') if isinstance(mission.get('en'),dict) else {}
+        if en:out['en']={k:en[k] for k in ('title','contractor','missionType') if en.get(k)}
+        out['bp']=self.blueprint_count(mission)
+        return out
+
+    def active_missions(self,limit=LIVE_LIMIT,offset=0,view='full'):
+        """Offene Live-Aufträge seitenweise (6.0.4). newest = jüngste Annahme über alle Seiten, für „Alle schließen“."""
+        if limit not in LIVE_PAGE_SIZES:raise ValueError('Ungültige Seitengröße.')
+        if type(offset) is not int or offset<0:raise ValueError('Ungültige Seite.')
+        if view not in ('full','mini'):raise ValueError('Ungültige Ansicht.')
         channel=self.settings()['paths']['channel']
         with self.db() as db:
             db.row_factory=sqlite3.Row
-            rows=[dict(r) for r in db.execute("SELECT m.* FROM scan_missions m WHERE "+OPEN_MISSIONS+" ORDER BY start DESC LIMIT ?",(channel,LIVE_LIMIT))]
-            total=db.execute("SELECT count(*) FROM scan_missions m WHERE "+OPEN_MISSIONS,(channel,)).fetchone()[0]
+            rows=[dict(r) for r in db.execute("SELECT m.* FROM scan_missions m WHERE "+OPEN_MISSIONS+" ORDER BY start DESC,guid LIMIT ? OFFSET ?",(channel,limit,offset))]
+            total,newest=db.execute("SELECT count(*),MAX(m.start) FROM scan_missions m WHERE "+OPEN_MISSIONS,(channel,)).fetchone()
         for row in rows:
             row['mission']=self.instance(row['guid'],self.match_mission(row.get('definition'),row.get('debug')))
             row['matched']=bool(row['mission'])
-        return {'channel':channel,'missions':rows,'total':total,'limit':LIVE_LIMIT}
+            if view=='mini':row['mission']=self.mini_mission(row['mission'])
+        return {'channel':channel,'missions':rows,'total':total,'limit':limit,'view':view,'offset':offset,'newest':newest,'pageSizes':list(LIVE_PAGE_SIZES)}
 
     def close_mission(self,body):
         """Close one entry (guid), a selection (guids) or all open entries (all).

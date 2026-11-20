@@ -1,0 +1,198 @@
+/* 6.0.3: Live-Aufträge als Akte. Miniatur-Deckel in der Liste, große Akte zum Blättern als Overlay. */
+@font-face{font-family:"SCBP Caveat";src:url("/assets/fonts/caveat-latin-500-normal.woff2") format("woff2");font-weight:500 600;font-display:swap}
+@font-face{font-family:"SCBP Caveat";src:url("/assets/fonts/caveat-latin-700-normal.woff2") format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"SCBP Fraktur";src:url("/assets/fonts/unifrakturmaguntia-latin-400-normal.woff2") format("woff2");font-display:swap}
+@font-face{font-family:"SCBP Typewriter";src:url("/assets/fonts/special-elite-latin-400-normal.woff2") format("woff2");font-display:swap}
+
+/* ---------- Miniatur in der Liste ---------- */
+.scan-list.akte-list{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px;align-items:start}
+.akte-card{display:flex;flex-direction:column;gap:12px;padding:14px 14px 16px}
+.akte-card>.live-check{float:none;margin:0;align-self:flex-end}
+.akte-card>.quiet-button{align-self:stretch}
+.akte-mini{position:relative;display:block;width:100%;max-width:300px;align-self:center;aspect-ratio:650/928;border:0;padding:0;margin:0;cursor:pointer;text-align:left;color:#2a2418;
+ font-family:"SCBP Typewriter","Courier New",monospace;border-radius:3px 7px 5px 3px;box-shadow:0 10px 22px rgba(0,0,0,.35);
+ transition:transform .25s ease,box-shadow .25s ease}
+.akte-mini:hover,.akte-mini:focus-visible{transform:translateY(-3px) rotate(-.6deg);box-shadow:0 16px 30px rgba(0,0,0,.45);outline:none}
+.akte-mini:focus-visible{box-shadow:0 0 0 3px var(--cyan,#4fd1ff),0 16px 30px rgba(0,0,0,.45)}
+.akte-mini:before{content:"";position:absolute;left:-7px;top:9px;width:98%;height:97%;z-index:-1;background:linear-gradient(160deg,#9fb3bf,#7f96a4);border-radius:4px;transform:rotate(-4deg)}
+.akte-mini .am-in{position:absolute;inset:0;padding:11% 9% 8% 15%;display:flex;flex-direction:column;border-radius:inherit;overflow:hidden}
+.akte-mini .am-hole{position:absolute;left:6%;width:3.2%;height:7.5%;border-radius:4px;background:#8e7a52;box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.akte-mini .am-ghost{font-size:8px;letter-spacing:.8px;overflow:hidden;text-overflow:ellipsis;margin-top:3%;color:rgba(70,70,120,.38);white-space:nowrap;transform:rotate(-2deg);margin-bottom:9%}
+.akte-mini .am-dept{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#4a3f2c}
+.akte-mini .am-org{font:400 19px/1.05 "SCBP Fraktur","Old English Text MT",serif;color:#16120c;margin:2px 0 8%;overflow-wrap:anywhere}
+.akte-mini .am-row{display:block;border-bottom:1px solid rgba(40,30,15,.5);padding:5px 0 2px}
+.akte-mini .am-row i{display:block;font-style:normal;font-size:9.5px;letter-spacing:1px;color:#4a3f2c}
+.akte-mini .am-row b{display:block;font:700 18px/1.08 "SCBP Caveat",cursive;color:#1d2450;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.akte-mini .am-row b.offen{color:#8a1c1c}.akte-mini .am-row b.voll{color:#1f6b3a}
+.akte-mini .am-stamp{align-self:center;margin:auto 0 0;transform:rotate(-8deg);border:3px double;padding:3px 9px 2px;font:700 12.5px "SCBP Typewriter";letter-spacing:2px;text-align:center;opacity:.85;white-space:nowrap}
+.akte-mini .am-stamp.offen{color:#b3201f;border-color:#b3201f}.akte-mini .am-stamp.voll{color:#1f6b3a;border-color:#1f6b3a}.akte-mini .am-stamp.leer{color:#5b4f38;border-color:#5b4f38}
+.akte-mini .am-foot{display:flex;justify-content:space-between;gap:6px;margin-top:9%;font-size:9.5px;color:#4a3f2c}
+.akte-mini .am-foot b{font:700 14px "SCBP Caveat";color:#1d2450;font-weight:700}
+.akte-mini .am-state{position:absolute;right:6%;top:2.4%;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:1px 6px;border:1.5px solid currentColor;transform:rotate(3deg)}
+.akte-mini .am-state.ok{color:#1f6b3a}.akte-mini .am-state.run{color:#1d4f8a}.akte-mini .am-state.bad{color:#8a1c1c}
+.akte-card.is-selected .akte-mini{box-shadow:0 0 0 3px var(--cyan,#4fd1ff),0 10px 22px rgba(0,0,0,.35)}
+.akte-card .am-nomatch{font-size:13px;color:var(--muted)}
+
+/* Manila-Oberfläche (Miniatur und Overlay) */
+.akte-manila{background:
+  radial-gradient(ellipse at 85% 90%,rgba(140,100,40,.28),transparent 45%),
+  radial-gradient(ellipse at 10% 5%,rgba(150,110,50,.30),transparent 35%),
+  radial-gradient(ellipse at 60% 40%,rgba(255,250,230,.35),transparent 60%),
+  linear-gradient(170deg,#d8c79c,#cbb680 60%,#c2a96e);
+ box-shadow:inset 0 0 60px rgba(120,80,20,.35)}
+.akte-mini.akte-manila{box-shadow:inset 0 0 30px rgba(120,80,20,.35),0 10px 22px rgba(0,0,0,.35)}
+
+/* ---------- Overlay ---------- */
+body.akte-lock{overflow:hidden}
+.akte-overlay{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:rgba(6,8,12,.86);backdrop-filter:blur(3px);animation:akteIn .3s ease}
+@keyframes akteIn{from{opacity:0}to{opacity:1}}
+.akte-bar{position:relative;display:flex;justify-content:flex-end;gap:8px;padding:10px 14px 0;flex:0 0 auto;min-height:46px}
+/* 6.0.7: OBS-Knopf mittig direkt über der aufgeschlagenen Akte (wächst und schrumpft mit der Akte) */
+.akte-stage .akte-obs{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:30;min-width:220px;height:44px;padding:0 20px;
+ font:500 16px/1 Inter,system-ui,sans-serif;letter-spacing:0;border:1.5px solid #e5484d;color:#ff7a7f;background:rgba(10,12,16,.72);border-radius:8px;cursor:pointer}
+.akte-stage .akte-obs:hover,.akte-stage .akte-obs:focus-visible{color:#fff;border-color:#ff6b70}
+.akte-stage .akte-obs[hidden]{display:none}
+.akte-stage .akte-obs.is-on{border-color:#e5484d;color:#fff;background:#c62a31}
+.akte-fit{flex:1 1 auto;position:relative;overflow:hidden}
+.akte-stage{position:absolute;left:50%;top:50%;width:1400px;height:1060px;margin:-530px 0 0 -700px;transform:scale(var(--akte-scale,1));transform-origin:50% 50%;
+ perspective:2600px;font-family:"SCBP Typewriter","Courier New",monospace;color:#2a2418;animation:akteZoom .45s cubic-bezier(.3,.7,.3,1)}
+@keyframes akteZoom{from{transform:scale(calc(var(--akte-scale,1)*.6));opacity:0}to{transform:scale(var(--akte-scale,1));opacity:1}}
+.akte-stage *{box-sizing:border-box}
+.akte-stage .book{position:absolute;left:700px;top:60px;width:650px;height:928px;transform-style:preserve-3d;transform:translateX(-325px);transition:transform 1.6s cubic-bezier(.6,.05,.25,1)}
+.akte-stage.open .book{transform:translateX(0)}
+.akte-stage .blue{position:absolute;left:-40px;top:40px;width:640px;height:888px;background:linear-gradient(160deg,#9fb3bf,#7f96a4);border-radius:6px;transform:rotate(-5deg) translateZ(-4px);box-shadow:0 18px 40px rgba(0,0,0,.35);transition:opacity .8s}
+.akte-stage.open .blue{opacity:0}
+.akte-stage .grain:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.25;background-image:repeating-linear-gradient(17deg,rgba(90,60,20,.12) 0 1px,transparent 1px 5px)}
+.akte-stage .back{position:absolute;inset:0;border-radius:4px 10px 6px 4px;box-shadow:0 24px 46px rgba(0,0,0,.45);transform-style:preserve-3d}
+.akte-stage .stack{position:absolute;left:8px;top:8px;right:6px;bottom:10px;background:#efe4c8;border-radius:3px;box-shadow:2px 2px 0 #e2d4ad,4px 4px 0 #ebdfbf,6px 6px 0 #d9c89c}
+.akte-stage .page{position:absolute;left:14px;top:12px;right:14px;bottom:16px;padding:32px 46px 26px 70px;display:flex;flex-direction:column;border-radius:3px;overflow:hidden;
+ background:radial-gradient(ellipse at 95% 95%,rgba(170,130,60,.22),transparent 40%),radial-gradient(ellipse at 0 0,rgba(170,130,60,.16),transparent 30%),#f3ead3;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.akte-stage .page>*{flex-shrink:0}
+.akte-stage .page .hole{background:#cdbd96;left:22px}
+.akte-stage .hole{position:absolute;left:40px;width:10px;height:70px;border-radius:6px;background:#8e7a52;box-shadow:inset 0 2px 3px rgba(0,0,0,.5)}
+.akte-stage .thread{position:absolute;left:30px;width:30px;height:2px;background:#cfc6b0;transform:rotate(-12deg)}
+.akte-stage .dept{font-size:22px;letter-spacing:4px;text-transform:uppercase;color:#4a3f2c}
+.akte-stage .head{font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#4a3f2c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.akte-stage .org{margin:4px 0 0;font:400 38px/1.05 "SCBP Fraktur","Old English Text MT",serif;color:#16120c}
+.akte-stage .orn{width:260px;margin:14px 0 18px 150px;border-top:1.5px solid #3a3020;position:relative}
+.akte-stage .orn:after{content:"◆";position:absolute;left:122px;top:-11px;font-size:13px;color:#3a3020}
+.akte-stage .title{align-self:flex-start;display:inline-block;font:700 42px "SCBP Caveat",cursive;color:#14110b;padding:0 16px 0 8px;margin:8px 0 10px -8px;
+ background:linear-gradient(100deg,transparent 2%,rgba(255,214,64,.75) 4%,rgba(255,206,40,.6) 92%,transparent 98%);transform:rotate(-1deg)}
+.akte-stage .title b{border-bottom:3px solid #14110b;font-weight:700}
+.akte-stage .row{display:grid;grid-template-columns:185px 1fr;align-items:end;border-bottom:1.5px solid rgba(40,30,15,.5);padding:4px 0 2px;min-height:70px}
+.akte-stage .rows-8 .row{min-height:62px}.akte-stage .rows-9 .row{min-height:56px}
+.akte-stage .row .l{font-size:16.5px;padding-bottom:6px}
+.akte-stage .row .v{font:600 30px/1.1 "SCBP Caveat",cursive;color:#1d2450;padding-left:6px;overflow-wrap:anywhere}
+.akte-stage .row .v.lang{font-size:27px;line-height:1.05;padding-bottom:4px}
+.akte-stage .row .v.red{color:#8a1c1c}.akte-stage .row .v.green{color:#1f6b3a}
+.akte-stage .row .v.prem{font-size:40px;color:#14335c}
+.akte-stage .stamp{position:absolute;right:44px;bottom:86px;transform:rotate(-14deg);border:5px double #b3201f;color:#b3201f;padding:6px 16px;font:700 30px "SCBP Typewriter";letter-spacing:4px;text-align:center;opacity:.82;
+ -webkit-mask-image:radial-gradient(circle at 30% 40%,#000 55%,rgba(0,0,0,.55) 75%);mask-image:radial-gradient(circle at 30% 40%,#000 55%,rgba(0,0,0,.55) 75%)}
+.akte-stage .stamp.green{border-color:#1f6b3a;color:#1f6b3a}.akte-stage .stamp.blue{border-color:#1d4f8a;color:#1d4f8a}
+.akte-stage .stamp small{display:block;font-size:13px;letter-spacing:3px}
+.akte-stage .pfoot{display:flex;justify-content:space-between;margin-top:auto;padding-top:14px;font-size:15px;color:#4a3f2c}
+/* Blätter */
+.akte-stage .leaf{position:absolute;left:14px;top:12px;right:14px;bottom:16px;transform-style:preserve-3d;transform-origin:-14px 50%;transform:rotateY(0deg) translateZ(var(--z,1px));transition:transform 1.4s cubic-bezier(.6,.05,.25,1)}
+.akte-stage .leaf.flipped{transform:rotateY(var(--a,-175deg)) translateZ(var(--z,1px))}
+.akte-stage .leaf .page{inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.akte-stage .leaf .lb{transform:rotateY(180deg)}
+.akte-stage .lb .hole{left:auto!important;right:22px}
+/* Seite 2 */
+.akte-stage .ez{font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#4a3f2c;margin:2px 0 4px}
+.akte-stage .brow{display:grid;grid-template-columns:200px 1fr;align-items:end;border-bottom:1px solid rgba(40,30,15,.35);min-height:46px}
+.akte-stage .brow .l{font-size:15px;padding-bottom:4px}.akte-stage .brow .v{font:600 25px/1.1 "SCBP Caveat",cursive;color:#1d2450;padding-bottom:2px}
+.akte-stage .sep{border-top:1.5px dashed rgba(40,30,15,.55);margin:16px 0 12px}
+.akte-stage .txt{margin:0 0 12px;font-size:15.5px;line-height:1.55;color:#231d12}
+.akte-stage .p2.long .txt{font-size:13.5px;line-height:1.45;margin-bottom:9px}
+.akte-stage .p2.long .brow{min-height:38px}.akte-stage .p2.long .brow .v{font-size:22px}
+.akte-stage .sig{display:flex;flex-direction:column;margin-top:8px}
+.akte-stage .sig .gl{font:600 24px/1 "SCBP Caveat";color:#1d2450}
+.akte-stage .sig .nm{font:700 34px/1.05 "SCBP Caveat";color:#14335c;transform:rotate(-2deg);transform-origin:left;margin:2px 0 0 6px}
+.akte-stage .sig .fn{font-size:13px;color:#4a3f2c;border-top:1px solid rgba(40,30,15,.5);padding-top:3px;width:360px}
+.akte-stage .closing{margin-top:auto;padding-top:12px}.akte-stage .closing~.pfoot{margin-top:0}
+.akte-stage .disc{margin:14px 0 0;font-size:11.5px;line-height:1.4;color:#6b5d42;font-style:italic}
+/* Seite 3 */
+.akte-stage .pool{border:1.5px solid rgba(40,30,15,.55);padding:10px 14px 6px;margin-top:14px;background:rgba(255,255,255,.18)}
+.akte-stage .ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.akte-stage .pn{font-size:14px;color:#8a1c1c;letter-spacing:.5px;overflow-wrap:anywhere}.akte-stage .pc{font-size:12px;letter-spacing:1px;white-space:nowrap}
+.akte-stage .ps{font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:#5b4f38;border-bottom:1.5px solid rgba(40,30,15,.55);padding:2px 0 6px;margin-bottom:2px}
+.akte-stage .ps .full{margin-left:8px;color:#1f6b3a;border:1.5px solid #1f6b3a;padding:0 5px;letter-spacing:1px}
+.akte-stage .it{display:grid;grid-template-columns:26px 1fr auto 82px;align-items:center;gap:7px;min-height:var(--it,52px);border-bottom:1px dashed rgba(40,30,15,.3)}
+.akte-stage .it:last-child{border-bottom:0}
+.akte-stage .it i{width:20px;height:20px;border:1.8px solid #3a3020;display:grid;place-items:center;font:700 24px/1 "SCBP Caveat";color:#1d2450;font-style:normal}
+.akte-stage .it .nm{font:600 var(--itf,22px)/1 "SCBP Caveat";color:#1d2450;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.akte-stage .it .src{font-size:11px;color:#7a6b4c;letter-spacing:.5px;white-space:nowrap}
+.akte-stage .it .st{font-size:12px;letter-spacing:2px;text-transform:uppercase;text-align:right;color:#1f6b3a}
+.akte-stage .it:not(.ok) .nm{color:#4a3f2c}.akte-stage .it:not(.ok) .st{color:#8a1c1c}.akte-stage .it.unk .st{color:#7a6b4c}
+.akte-stage .empty{margin-top:24px;font-size:16px;line-height:1.5;color:#4a3f2c}
+/* Seite 4 */
+.akte-stage .sh{font-size:12.5px;letter-spacing:2.5px;text-transform:uppercase;color:#8a1c1c;margin:16px 0 6px;border-bottom:1px solid rgba(40,30,15,.45);padding-bottom:3px}
+.akte-stage .loc{font:700 36px/1.05 "SCBP Caveat";color:#1d2450}
+.akte-stage .sm{font-size:13px;line-height:1.45;color:#5b4f38}
+.akte-stage .ln{display:flex;justify-content:space-between;gap:10px;font-size:14px;line-height:1.75}
+.akte-stage .ln em{font-style:normal;color:#5b4f38;white-space:nowrap}.akte-stage .ln.red span{color:#8a1c1c}.akte-stage .ln.green span{color:#1f6b3a}
+.akte-stage .ln span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.akte-stage .ms{border:1px solid rgba(40,30,15,.45);padding:8px 10px;margin-bottom:8px}
+/* Deckel */
+.akte-stage .cover{position:absolute;inset:0;transform-origin:0 50%;transform-style:preserve-3d;transform:rotateY(0deg) translateZ(6px);transition:transform 1.6s cubic-bezier(.6,.05,.25,1)}
+.akte-stage.open .cover{transform:rotateY(-179deg) translateZ(0px)}
+.akte-stage .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:4px 10px 6px 4px}
+.akte-stage .front{padding:60px 60px 40px 96px;box-shadow:0 24px 46px rgba(0,0,0,.45)}
+.akte-stage .inside{transform:rotateY(180deg);padding:60px 90px 40px 60px;background:linear-gradient(190deg,#d3c08f,#c6ae74);box-shadow:inset 0 0 50px rgba(120,80,20,.3)}
+.akte-stage .k{position:absolute;right:46px;top:24px;font-size:13px;color:#555}
+.akte-stage .front .dept{margin-top:90px;font-size:24px}
+.akte-stage .front .org{font-size:44px}
+.akte-stage .ghost{position:absolute;left:96px;top:44px;white-space:nowrap;font-size:19px;color:rgba(70,70,120,.35);transform:rotate(-2deg);letter-spacing:3px}
+.akte-stage .f-row{display:grid;grid-template-columns:120px 1fr;align-items:end;border-bottom:1.5px solid rgba(40,30,15,.55);min-height:58px;margin-top:6px}
+.akte-stage .f-row .l{font-size:19px;padding-bottom:6px}.akte-stage .f-row .v{font:700 36px "SCBP Caveat";color:#1d2450;overflow-wrap:anywhere}
+.akte-stage .f-row .v.lang{font-size:32px;line-height:1.05;padding-bottom:4px}
+.akte-stage .f-row .v.offen{color:#8a1c1c}.akte-stage .f-row .v.voll{color:#1f6b3a}
+.akte-stage .bpstamp{position:absolute;left:130px;top:620px;max-width:440px;transform:rotate(-7deg);border:5px double;padding:10px 22px 8px;font:700 32px "SCBP Typewriter";letter-spacing:4px;text-align:center;opacity:.85;
+ -webkit-mask-image:radial-gradient(circle at 35% 40%,#000 58%,rgba(0,0,0,.55) 80%);mask-image:radial-gradient(circle at 35% 40%,#000 58%,rgba(0,0,0,.55) 80%)}
+.akte-stage .bpstamp small{display:block;font-size:15px;letter-spacing:2px;margin-top:4px;white-space:normal}
+.akte-stage .bpstamp.offen{color:#b3201f;border-color:#b3201f}.akte-stage .bpstamp.voll{color:#1f6b3a;border-color:#1f6b3a}.akte-stage .bpstamp.leer{color:#5b4f38;border-color:#5b4f38}
+.akte-stage .f-foot{position:absolute;left:96px;right:60px;bottom:46px;display:flex;justify-content:space-between;align-items:end}
+.akte-stage .heft{font-size:20px}.akte-stage .heft b{font:700 34px "SCBP Caveat";color:#1d2450;border-bottom:1.5px solid #3a3020;padding:0 40px 0 10px}
+.akte-stage .jahr{font-size:20px;transform:rotate(-6deg)}.akte-stage .jahr b{font:700 32px "SCBP Caveat";color:#1d2450;border-bottom:1.5px solid #3a3020;padding:0 6px}
+.akte-stage .hint{position:absolute;right:60px;bottom:120px;font-size:16px;color:rgba(60,45,20,.6);letter-spacing:2px}
+.akte-stage .slip{background:#f1e9d2;padding:24px 26px;box-shadow:0 2px 6px rgba(0,0,0,.2);transform:rotate(-1.5deg)}
+.akte-stage .slip .h3{margin:0 0 12px;font:400 30px "SCBP Fraktur",serif}
+.akte-stage .slip table{width:100%;border-collapse:collapse;font-size:15px}.akte-stage .slip td,.akte-stage .slip th{border:1px solid #6b5d42;padding:8px;text-align:left}
+.akte-stage .slip th{font-weight:400;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5b4f38}
+.akte-stage .slip td.h{font:700 24px "SCBP Caveat";color:#1d2450}
+.akte-stage .slip p{margin:16px 0 0;font-size:14px;color:#5b4f38}
+.akte-stage .pocket{position:absolute;left:40px;right:70px;bottom:40px;height:150px;border-top:2px solid rgba(90,60,20,.4);background:linear-gradient(180deg,rgba(120,85,35,.18),rgba(120,85,35,.05));border-radius:0 0 6px 6px;font-size:15px;color:rgba(70,50,20,.7);padding:16px 20px;letter-spacing:2px}
+.akte-stage .replay{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:14px;color:rgba(235,228,210,.7);letter-spacing:1px}
+/* Klickzonen */
+.akte-stage .edge{position:absolute;top:60px;height:928px;width:90px;z-index:20;cursor:pointer;display:flex;align-items:center;justify-content:center;
+ font:700 54px/1 Georgia,serif;color:rgba(42,36,24,0);border-radius:6px;transition:left 1.6s cubic-bezier(.6,.05,.25,1),background .2s,color .2s}
+.akte-stage .edge:hover,.akte-stage .edge:focus-visible{color:rgba(42,36,24,.55);outline:none}
+.akte-stage .edge.l{left:375px}.akte-stage .edge.r{left:935px}
+.akte-stage .edge.l:hover,.akte-stage .edge.l:focus-visible{background:linear-gradient(90deg,rgba(42,36,24,.16),transparent)}
+.akte-stage .edge.r:hover,.akte-stage .edge.r:focus-visible{background:linear-gradient(270deg,rgba(42,36,24,.16),transparent)}
+.akte-stage.open .edge.l{left:45px}.akte-stage.open .edge.r{left:1260px}
+.akte-stage .edge.off{cursor:default}.akte-stage .edge.off:hover{color:rgba(42,36,24,.18);background:none}
+.akte-stage.nudge-l .book{animation:akteNl .35s}.akte-stage.nudge-r .book{animation:akteNr .35s}
+@keyframes akteNl{50%{margin-left:-10px}}@keyframes akteNr{50%{margin-left:10px}}
+@media (prefers-reduced-motion:reduce){
+ .akte-mini,.akte-stage .book,.akte-stage .cover,.akte-stage .blue,.akte-stage .edge,.akte-stage .leaf{transition:none}
+ .akte-overlay,.akte-stage,.akte-stage.nudge-l .book,.akte-stage.nudge-r .book{animation:none}
+}
+/* Seite 5: Ausgaben und Reiseverlauf (6.0.3, aus dem Spiel-Log) */
+.akte-stage .tb{width:100%;border-collapse:collapse;font-size:14px}
+.akte-stage .tb th{font-weight:400;font-size:11.5px;letter-spacing:1.5px;text-transform:uppercase;color:#5b4f38;text-align:left;padding:3px}
+.akte-stage .tb td{padding:5px 3px;border-top:1px dashed rgba(40,30,15,.3);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.akte-stage .tb .n{text-align:right}.akte-stage .tb .sum td{border-top:1.5px solid rgba(40,30,15,.6);font-weight:700}
+.akte-stage .tb .q{color:#7a6b4c}.akte-stage .tb .plus{color:#1f6b3a}
+.akte-stage .bar{display:grid;grid-template-columns:150px 1fr 48px;align-items:center;gap:6px;font-size:13.5px;white-space:nowrap;line-height:2}
+.akte-stage .bar i{display:block;height:14px;background:#b3201f;opacity:.8;justify-self:start;min-width:2px}.akte-stage .bar em{font-style:normal;text-align:right}
+.akte-stage .trip div{font-size:14px;line-height:1.3;padding:3px 0 3px 18px;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.akte-stage .trip div:before{content:"";position:absolute;left:0;top:7px;width:9px;height:9px;border-radius:50%;border:1.5px solid #9a6a05}
+.akte-stage .trip .q:before{background:#1d4f8a;border-color:#1d4f8a}.akte-stage .trip .m:before{background:#b3201f;border-color:#b3201f}
+.akte-stage .trip .red b{color:#8a1c1c}
+.akte-stage .trip em{font-style:normal;color:#5b4f38;margin-right:8px}.akte-stage .trip b{font-weight:400}
+.akte-stage .p5 .sh{margin-top:12px}
+
+/* 6.0.7: OBS-Quelle /obs-akte.html – durchsichtig, ohne Bedienelemente, mittig */
+.akte-overlay.akte-obsmode{background:transparent;backdrop-filter:none;animation:none;pointer-events:none}
+.akte-obsmode .akte-fit{overflow:visible}

@@ -21,7 +21,9 @@ from pathlib import Path
 from .common import atomic_json, read_json
 from .scanner import effective_mode
 
-SELECT = re.compile(r'CreateMarker|<EndMission>|LocationName\[|TargetName\[|Added notification "(?:Auftrag angenommen|Contract Accepted|Auftrag abgeschlossen|Contract Complete|Bauplan erhalten|Received Blueprint):', re.I)
+# 6.0.3: dazu Ladenkäufe/-verkäufe und Reise-Meldungen (Seite 5 der Akte), gleiche Liste wie Read-GameLogs.ps1
+SELECT = re.compile(r'CreateMarker|<EndMission>|LocationName\[|TargetName\[|Added notification "(?:Auftrag angenommen|Contract Accepted|Auftrag abgeschlossen|Contract Complete|Bauplan erhalten|Received Blueprint):|SendShopBuyRequest|RmShopFlowResponse|SendCommoditySellRequest|<Quantum Drive Arrived|Added notification "(?:Rechtsgebiet von|Entered [^"]{0,60}Jurisdiction|Waffenstillstandszone|Entering Armistice|Leaving Armistice|Privatgel|Entering Private|Leaving Private|Kontrollierten Raum|Entering Controlled|Leaving Controlled|Hangaranfrage|Hangar Request|Du bist Kanal|You have joined channel|You joined channel)', re.I)
+CONTEXT_VERSION = 2
 LIMIT = 262144
 BIG = 1048576
 BACKUP_BUDGET = 33554432
@@ -168,9 +170,9 @@ class LocalAgent:
             key = channel + '|' + str(path)
             entry = self.files.get(key)
             length = os.fstat(stream.fileno()).st_size
-            upgrade = entry is not None and entry.get('contextVersion', 0) != 1
+            upgrade = entry is not None and entry.get('contextVersion', 0) < CONTEXT_VERSION
             if upgrade or entry is None or entry.get('generation') != generation or length < entry.get('position', 0):
-                entry = {'generation': generation, 'contextVersion': 1, 'position': 0, 'initialEnd': length if (backup or self.first_pass or upgrade) else 0, 'size': length}
+                entry = {'generation': generation, 'contextVersion': CONTEXT_VERSION, 'position': 0, 'initialEnd': length if (backup or self.first_pass or upgrade) else 0, 'size': length}
                 self.files[key] = entry
             entry['size'] = length
             position = entry['position']
@@ -251,7 +253,10 @@ class LocalAgent:
                     key = cfg['paths']['channel'] + '|' + str(file)
                     entry = self.files.get(key)
                     stat = file.stat()
-                    unchanged = entry is not None and entry.get('contextVersion', 0) == 1 and entry.get('position') == stat.st_size and entry.get('writeTicks') == stat.st_mtime_ns
+                    # 6.0.3: Sicherungen älter als 7 Tage beim Wechsel auf Lesestand 2 nicht erneut lesen
+                    if entry is not None and entry.get('contextVersion', 0) < CONTEXT_VERSION and entry.get('position') == stat.st_size and stat.st_mtime < time.time() - 7 * 86400:
+                        entry['contextVersion'] = CONTEXT_VERSION
+                    unchanged = entry is not None and entry.get('contextVersion', 0) >= CONTEXT_VERSION and entry.get('position') == stat.st_size and entry.get('writeTicks') == stat.st_mtime_ns
                     if not unchanged and budget > 0:
                         while True:
                             got = self.read_block(file, True)
@@ -261,7 +266,7 @@ class LocalAgent:
                         entry = self.files.get(key)
                         if entry is not None and entry.get('position') == stat.st_size:
                             entry['writeTicks'] = stat.st_mtime_ns
-                    if entry is None or entry.get('contextVersion', 0) != 1 or entry.get('position', 0) < stat.st_size:
+                    if entry is None or entry.get('contextVersion', 0) < CONTEXT_VERSION or entry.get('position', 0) < stat.st_size:
                         pending += 1
                     else:
                         processed += 1

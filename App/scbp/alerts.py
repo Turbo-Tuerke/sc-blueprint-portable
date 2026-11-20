@@ -12,19 +12,22 @@ class Alerts:
         self.path=Path(path);self.path.parent.mkdir(parents=True,exist_ok=True); self.catalog=catalog;self.settings=settings;self.clock=clock;self.lock=threading.RLock();self.observed_signature=None
         with self.db() as db:
             db.executescript('CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY,value TEXT);CREATE TABLE IF NOT EXISTS seen (ini TEXT PRIMARY KEY);CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT,created REAL,started REAL,expires REAL,kind TEXT,items TEXT,title TEXT,status TEXT DEFAULT "queued");')
+            # 6.0.6: Einblendungen aus der Akte bleiben stehen, bis sie ausgeblendet werden
+            try:db.execute('ALTER TABLE events ADD COLUMN persistent INTEGER DEFAULT 0')
+            except sqlite3.OperationalError:pass
     @contextmanager
     def db(self):
         connection=sqlite3.connect(self.path,timeout=10)
         try:
             with connection:yield connection
         finally:connection.close()
-    def enqueue(self,items,kind='acquired',title=''):
+    def enqueue(self,items,kind='acquired',title='',persistent=False):
         if not items:return None
         last=None
         with self.lock,self.db() as db:
             for offset in range(0,len(items),9):
                 data=[self.catalog.public(i) if 'scmdb' in i else i for i in items[offset:offset+9]]
-                last=db.execute('INSERT INTO events(created,kind,items,title) VALUES(?,?,?,?)',(self.clock(),kind,json.dumps(data,ensure_ascii=False),title)).lastrowid
+                last=db.execute('INSERT INTO events(created,kind,items,title,persistent) VALUES(?,?,?,?,?)',(self.clock(),kind,json.dumps(data,ensure_ascii=False),title,int(bool(persistent)))).lastrowid
         return last
     def observe(self):
         items=self.catalog.refresh()
@@ -51,13 +54,15 @@ class Alerts:
             db.row_factory=sqlite3.Row
             db.execute('UPDATE events SET status="expired" WHERE status="queued" AND created<?',(ts-settings['queueMaxAgeSeconds'],))
             db.execute('UPDATE events SET status="shown" WHERE status="playing" AND expires<=?',(ts,))
+            # Eine stehende Akte macht Platz, sobald etwas Neues ansteht (neuer Fund, angenommener Auftrag, andere Akte)
+            db.execute('UPDATE events SET status="shown" WHERE status="playing" AND persistent=1 AND EXISTS(SELECT 1 FROM events WHERE status="queued")')
             if not settings['enabled']:
                 db.execute('UPDATE events SET status="skipped" WHERE status IN ("queued","playing")')
             row=db.execute('SELECT * FROM events WHERE status="playing" ORDER BY id LIMIT 1').fetchone()
             if not row and consume and settings['enabled']:
                 row=db.execute('SELECT * FROM events WHERE status="queued" ORDER BY id LIMIT 1').fetchone()
                 if row:
-                    db.execute('UPDATE events SET started=?,expires=?,status="playing" WHERE id=?',(ts,ts+(20 if row['kind']=='mission-accepted' else settings.get('detailDurationSeconds',settings['durationSeconds']) if row['kind'] in ('mission-details','mission-brief') else settings.get('rewardDurationSeconds',settings['durationSeconds'])),row['id']))
+                    db.execute('UPDATE events SET started=?,expires=?,status="playing" WHERE id=?',(ts,ts+(1728000 if row['persistent'] else 20 if row['kind']=='mission-accepted' else settings.get('detailDurationSeconds',settings['durationSeconds']) if row['kind'] in ('mission-details','mission-brief') else settings.get('rewardDurationSeconds',settings['durationSeconds'])),row['id']))
                     row=db.execute('SELECT * FROM events WHERE id=?',(row['id'],)).fetchone()
             event=dict(row) if row else None
             if event:event['items']=json.loads(event['items'])
@@ -83,5 +88,13 @@ class Alerts:
             rows=[dict(r) for r in db.execute('SELECT * FROM events ORDER BY id DESC LIMIT 30')]
         for r in rows:r['items']=json.loads(r['items'])
         return {'events':rows,**self.current(), 'baselineReady':bool(self.catalog.items) and not self.catalog.error}
+    def hide(self,event_id):
+        """6.0.6: Nur diese eine Einblendung beenden (Knopf „OBS-Ausblenden“ in der Akte)."""
+        with self.lock,self.db() as db:return db.execute('UPDATE events SET status="skipped" WHERE id=? AND status IN ("queued","playing")',(int(event_id),)).rowcount
+    def active(self,event_id):
+        self.current(False)
+        with self.lock,self.db() as db:
+            row=db.execute('SELECT status FROM events WHERE id=?',(int(event_id),)).fetchone()
+        return bool(row and row[0] in ('queued','playing'))
     def clear(self):
         with self.lock,self.db() as db:db.execute('UPDATE events SET status="skipped" WHERE status IN ("queued","playing")')

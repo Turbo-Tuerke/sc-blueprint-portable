@@ -1,6 +1,6 @@
 # SC Blueprint Dashboard – Portable Version
 
-**Version 6.0.2** · Windows 10/11 (64 Bit) · Deutsch und Englisch
+**Version 6.0.9** · Windows 10/11 (64 Bit) · Deutsch und Englisch
 
 Inoffizielles Fan-Werkzeug für Star Citizen. Es zeigt alle Baupläne (Blueprints), in welchen Aufträgen du sie bekommst, wo du die Materialien findest und welche Baupläne du schon hast. Neue Funde erkennt es automatisch aus dem `Game.log` des Spiels; für den Stream gibt es eine OBS-Einblendung.
 

@@ -203,6 +203,3 @@ class Media:
         for item in self.catalog.refresh():
             if not self.cached(item).get('at'):self.schedule(item['id'],False,2)
         return {'ok':True,'queued':len(self.pending),'message':'Bildprüfung läuft im Hintergrund. Bei vielen Items kann dies länger dauern.'}
-    def ships(self):
-        # 5.4.0: FleetYards wird nicht mehr abgerufen. Die zuletzt gespeicherte Schiffsliste bleibt lesbar.
-        return {**read_json(self.state/'ships.json',{'ships':[],'at':0}),'offline':True,'frozen':True}
