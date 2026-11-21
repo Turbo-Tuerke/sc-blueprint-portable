@@ -15,7 +15,7 @@ import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from .common import now
-from .source_catalog import load_name_aliases
+from .source_catalog import load_name_aliases, load_name_overrides
 from . import journal
 
 STAMP = re.compile(r'^<([0-9T:\-.Z]+)>')
@@ -103,8 +103,12 @@ class Scanner:
         index={}
         def add(alias,ini):
             if alias:index.setdefault(normalized(alias),set()).add(ini)
+        fixed=load_name_overrides()
         for i in items:
             add(i['name'],i['ini'])
+            # 6.0.11: Wo die feste Namenstabelle korrigiert, sind die SCMDB-Namen verschoben
+            # (z. B. Antium Arms Maroon heisst dort „Antium Helmet Jet“) und duerfen nichts zuordnen.
+            if i['ini'] in fixed:continue
             add(i.get('scmdb',{}).get('name'),i['ini'])
             add(i.get('scmdb',{}).get('profile',{}).get('name'),i['ini'])
         # Feste Zusatznamen (alte Spielnamen) aus der Schlüsseltabelle: explizite Zuordnungen, keine Vermutung.
@@ -113,7 +117,39 @@ class Scanner:
         for alias,target in ALIASES.items():
             for ini in list(index.get(normalized(target),set())):add(alias,ini)
         with self.lock:self._name_index=index;self._name_signature=signature
+        self.reresolve(index)
         return index
+
+    def reresolve(self,index):
+        """6.0.11: Gespeicherte Logfunde nach geänderter Namenszuordnung neu zuordnen.
+
+        Nur automatisch zugeordnete ('resolved') und offene ('unresolved') Funde; von Hand
+        bestätigte ('reviewed') bleiben. Besitz wird nur ergänzt: Einträge aus Startbestand oder
+        Prüfung bleiben, ein reiner Logbesitz ohne verbleibenden Fund wird entfernt."""
+        def target(name):
+            candidates=index.get(normalized(name),set())
+            if COMPONENT_SUFFIX.search(name):candidates={k for k in candidates if k in self.catalog.by_key and self.catalog.by_key[k]['mainCategory']=='vehicle'}
+            return sorted(candidates)[0] if len(candidates)==1 else None
+        changed=0
+        with self.lock,self.db() as db:
+            db.execute('CREATE TABLE IF NOT EXISTS seen (ini TEXT PRIMARY KEY)')
+            rows=db.execute("SELECT id,channel,ts,name,ini,historical FROM scan_events WHERE kind='blueprint' AND status IN ('resolved','unresolved')").fetchall()
+            dropped=set()
+            for ident,channel,ts,name,old,historical in rows:
+                new=target(name or '')
+                if new==old:continue
+                db.execute('UPDATE scan_events SET ini=?,status=? WHERE id=?',(new,'resolved' if new else 'unresolved',ident))
+                if old:dropped.add((channel,old))
+                if new:
+                    db.execute("INSERT INTO scan_owned VALUES(?,?,?,?) ON CONFLICT(channel,ini) DO UPDATE SET at=excluded.at WHERE scan_owned.source='log' AND excluded.at<scan_owned.at",(channel,new,ts,'log'))
+                    # Alte Funde sollen im Stream keine Meldung auslösen.
+                    db.execute('INSERT OR IGNORE INTO seen VALUES(?)',(new,))
+                changed+=1
+            for channel,old in dropped:
+                if not db.execute("SELECT 1 FROM scan_events WHERE channel=? AND ini=?",(channel,old)).fetchone():
+                    db.execute("DELETE FROM scan_owned WHERE channel=? AND ini=? AND source='log'",(channel,old))
+            if changed:self.bump(db)
+        return changed
 
     def resolve_name(self,name):
         candidates=self.name_index().get(normalized(name),set())
@@ -336,7 +372,7 @@ class Scanner:
             for entry in pool.get('items') or []:
                 item=uuid.get(entry.get('entityClass')) or bp.get(entry.get('blueprintRecord')) or names.get(normalized(entry.get('name') or ''))
                 key=item['id'] if item else normalized(entry.get('name') or '')
-                if key not in seen:seen[key]=(entry.get('name'),bool(item and item.get('isDone')))
+                if key not in seen:seen[key]=((item or {}).get('name') or entry.get('name'),bool(item and item.get('isDone')))
         return {'ok':sum(1 for _,done in seen.values() if done),'total':len(seen),'open':[n for n,done in seen.values() if not done][:6]}
     def mini_mission(self,mission):
         if not mission:return mission

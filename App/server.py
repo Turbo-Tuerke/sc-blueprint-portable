@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent
 DATA = Path(os.environ.get('SCBP_DATA', ROOT / 'data'))
 STATE = Path(os.environ.get('SCBP_STATE', ROOT / 'state'))
 MEDIA = Path(os.environ.get('SCBP_MEDIA', ROOT / 'media'))
-VERSION = '6.0.9'
+VERSION = '6.0.11'
 # 5.0: SCBP_MODE=standalone -> Einzelversion für Windows/Bazzite (kein NAS, integrierter Log-Leser)
 STANDALONE = os.environ.get('SCBP_MODE','').lower()=='standalone'
 THEMES = ['aurum','polaris','sentinel','obsidian','atlas','vanguard','aurora','eclipse','forge','meridian','halo','nocturne']
@@ -215,6 +215,10 @@ def services():
    source=SourceCatalog(STATE,DATA,lambda:config()['settings']);cat=Catalog(DATA,source,lambda:config()['settings']);cat.manual=manual_ownership;cat.refresh();media=Media(MEDIA,STATE,cat,lambda:config()['settings']);media.initialize()
    alerts=Alerts(STATE/'events.sqlite3',cat,lambda:config()['settings']);alerts.observe()
    scanner=Scanner(STATE/'events.sqlite3',cat,lambda:config()['settings']);cat.ownership=scanner.overlay;cat.confirmations=scanner.confirmations
+   # 6.0.11: Namensindex beim Start bauen, damit verschobene Zuordnungen sofort korrigiert werden.
+   try:
+    if cat.items:scanner.name_index()
+   except Exception:pass
    SERVICES={'catalog':cat,'media':media,'alerts':alerts,'scanner':scanner,'sources':source};media.start()
   return SERVICES
 

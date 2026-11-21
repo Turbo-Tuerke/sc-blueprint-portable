@@ -531,7 +531,7 @@ function renderOverview() {
   document.getElementById("quickSync").textContent = elements.syncTimestamp.textContent;
   renderSyncBadge();
   const patch = state.catalog?._meta?.version_patch;
-  elements.footerVersion.textContent = patch ? `DASHBOARD 6.0.9 · CATALOG ${String(patch).toUpperCase()}` : "DASHBOARD 6.0.9";
+  elements.footerVersion.textContent = patch ? `DASHBOARD 6.0.11 · CATALOG ${String(patch).toUpperCase()}` : "DASHBOARD 6.0.11";
   renderActivityChart();
 }
 
@@ -1362,7 +1362,7 @@ function renderRewardPool(pool) {
     <header><div><strong>${escapeHtml(pool.name || pool.id || "Bauplan-Pool")}</strong><small>${owned}/${poolSize || items.length} bereits erhalten</small></div><span>${formatPercent(pool.chancePercent)} Chance · ${drawCount} von ${formatNumber(poolSize || items.length)}</span></header>
     <div class="reward-item-list">${resolved.length ? resolved.map(({ entry, item }) => `
       <button class="reward-item-row ${item?.isDone ? "is-owned" : ""}" data-ownership="${item?.ownershipSource||'sync'}" type="button" ${item ? `data-reward-item-id="${item.id}"` : "disabled"}>
-        <i aria-hidden="true">⌕</i><span>${escapeHtml(entry.name || "Unbekannter Bauplan")} ${item?.isDone||typeof item?.manualOwned==='boolean'?`<small class="ownership-source">${item.ownershipSource==='manual'?'Manuell':item.ownershipSource==='log'?'Spiel-Log':'Synchronisiert'}</small>`:''}</span>
+        <i aria-hidden="true">⌕</i><span>${escapeHtml(item?.name || entry.name || "Unbekannter Bauplan")} ${item?.isDone||typeof item?.manualOwned==='boolean'?`<small class="ownership-source">${item.ownershipSource==='manual'?'Manuell':item.ownershipSource==='log'?'Spiel-Log':'Synchronisiert'}</small>`:''}</span>
         <span class="reward-owned" title="${item?.isDone ? "Bauplan erhalten" : item ? "Bauplan offen" : "Nicht im lokalen Katalog"}"><b aria-hidden="true">${item?.isDone ? "✓" : ""}</b>${item?.isDone ? "ERHALTEN" : item ? "OFFEN" : "UNBEKANNT"}</span>
       </button>`).join("") : `<p class="reward-pool-empty">Die vollständige Poolliste wird beim nächsten automatischen SCMDB-Abgleich ergänzt.</p>`}</div>
   </article>`;

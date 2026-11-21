@@ -766,7 +766,8 @@
  },
  "names": {
   "item_Name_outlaw_legacy_armor_light_helmet_01_01_01": "Oracle Helmet",
-  "item_Name_qrt_specialist_heavy_arms_01_01_13": "Antium Arms Maroon"
+  "item_Name_qrt_specialist_heavy_arms_01_01_13": "Antium Arms Maroon",
+  "item_Name_qrt_specialist_heavy_helmet_01_01_12": "Antium Helmet Jet"
  },
  "aliases": {
   "BUL-H4 Ammo Carrier": "item_Name_cds_combat_superheavy_backpack_01_01_01",

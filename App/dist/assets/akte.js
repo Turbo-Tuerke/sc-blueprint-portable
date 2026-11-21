@@ -26,7 +26,7 @@ window.Akte=(()=>{
   const unique=new Map();
   for(const p of pools)for(const r of p.rows){const k=r.item?.id||norm(r.entry.name);if(!unique.has(k))unique.set(k,r);}
   const rows=[...unique.values()];
-  return {pools,total:rows.length,ok:rows.filter(r=>r.item?.isDone).length,open:rows.filter(r=>!r.item?.isDone).map(r=>r.entry.name||'?'),rows};
+  return {pools,total:rows.length,ok:rows.filter(r=>r.item?.isDone).length,open:rows.filter(r=>!r.item?.isDone).map(r=>r.item?.name||r.entry.name||'?'),rows};
  }
  const cleanTitle=t=>String(t||'').replace(/\s*\[BP[^\]]*\]/gi,'').replace(/\s+\d+\s*XP\s*$/i,'').trim()||String(t||'');
  const date=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleDateString(locale,{day:'2-digit',month:'2-digit',year:'numeric'});};
@@ -133,7 +133,7 @@ window.Akte=(()=>{
    return `<div class="pool"><div class="ph"><span class="pn">${e(p.name||p.id||T('Bauplan-Pool','Blueprint pool'))}</span><span class="pc">${Number.isFinite(chance)?e(chance.toLocaleString(locale,{maximumFractionDigits:1}))+' % '+e(T('Chance','chance'))+' · ':''}${draw} ${e(T('von','of'))} ${size}</span></div>
     <div class="ps">${ok} / ${size} ${e(T('bereits erhalten','already collected'))}${ok===size&&size?`<span class="full">${e(T('vollständig','complete'))}</span>`:''}</div>
     ${p.rows.map(({entry,item})=>{const done=!!item?.isDone,src=done?({manual:T('Manuell','Manual'),log:T('Spiel-Log','Game log')})[item.ownershipSource]||T('Synchronisiert','Synced'):'';
-     return `<div class="it${done?' ok':''}${item?'':' unk'}"><i>${done?'✓':''}</i><span class="nm" title="${e(entry.name)}">${e(entry.name||'?')}</span><span class="src">${e(src)}</span><span class="st">${e(done?T('erhalten','collected'):item?T('offen','open'):T('unbekannt','unknown'))}</span></div>`;}).join('')}</div>`;}).join('');
+     return `<div class="it${done?' ok':''}${item?'':' unk'}"><i>${done?'✓':''}</i><span class="nm" title="${e(item?.name||entry.name)}">${e(item?.name||entry.name||'?')}</span><span class="src">${e(src)}</span><span class="st">${e(done?T('erhalten','collected'):item?T('offen','open'):T('unbekannt','unknown'))}</span></div>`;}).join('')}</div>`;}).join('');
   return `<div class="page lf p3" style="--it:${it}px;--itf:${Math.min(22,Math.max(16,it*.45))}px">${holes}${head(org)}<div class="title"><b>${e(T('Bauplan-Belohnungen','Blueprint rewards'))}</b></div>
    ${pools||`<p class="empty">${e(T('SCMDB nennt für diesen Auftrag keine Bauplan-Belohnungen.','SCMDB lists no blueprint rewards for this contract.'))}</p>`}${foot(3)}</div>`;
  }
@@ -157,7 +157,7 @@ window.Akte=(()=>{
     ${mins!=null?`<div class="sm">${e(T('Dauer ','Duration '))}${mins} Min${limit?` · ${e(T('Zeitlimit ','time limit '))}${limit} Min`:''}</div>`:''}
    </div>
    <div class="sh">${e(T('In diesem Zeitraum erhalten','Collected during this contract'))}</div>
-   ${got.length?got.map(r=>`<div class="ln green"><span>✓ ${e(r.entry.name)}</span><em>${e(time(r.item.acquiredAt))}</em></div>`).join(''):`<div class="sm">${e(T('Kein neuer Bauplan aus diesem Auftrag im Log.','No new blueprint from this contract in the log.'))}</div>`}
+   ${got.length?got.map(r=>`<div class="ln green"><span>✓ ${e(r.item.name||r.entry.name)}</span><em>${e(time(r.item.acquiredAt))}</em></div>`).join(''):`<div class="sm">${e(T('Kein neuer Bauplan aus diesem Auftrag im Log.','No new blueprint from this contract in the log.'))}</div>`}
    <div class="sh">${e(T('Weitere Einträge dieser Sitzung','Other entries in this session'))}</div>
    ${session.length?session.map(r=>{const s=status(r);return `<div class="ln${s.cls==='bad'?' red':''}"><span>${e(cleanTitle(r.mission?.title||r.debug||r.guid))} · ${e(s.text)}</span><em>${e(time(r.start))}</em></div>`;}).join(''):`<div class="sm">${e(T('Keine weiteren offenen Einträge in dieser Sitzung.','No other open entries in this session.'))}</div>`}
    ${foot(4)}</div>`;

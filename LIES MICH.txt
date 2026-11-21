@@ -1,4 +1,4 @@
-﻿SC BLUEPRINT DASHBOARD 6.0.9 - PORTABLE VERSION FUER WINDOWS (64 BIT)
+﻿SC BLUEPRINT DASHBOARD 6.0.11 - PORTABLE VERSION FUER WINDOWS (64 BIT)
 
 START
 1. ZIP vollstaendig in einen eigenen Ordner entpacken (nicht direkt aus dem ZIP starten).
